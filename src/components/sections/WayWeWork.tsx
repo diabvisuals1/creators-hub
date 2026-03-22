@@ -20,18 +20,7 @@ export default function Page() {
   return (
     <main className="w-full">
       <WayWeWork />
-
-      <HowWeHelp
-        bigIcon={
-          <Image
-            src="/howwehelp/notebook.svg"
-            alt=""
-            width={220}
-            height={150}
-            priority
-          />
-        }
-      />
+      <HowWeHelp />
     </main>
   );
 }
@@ -256,10 +245,11 @@ type Tab = {
   title: string;
   desc: string;
   bullets: string[];
+  icon: string;
+  iconAlt: string;
 };
 
 type HowWeHelpProps = {
-  bigIcon?: React.ReactNode;
   className?: string;
 };
 
@@ -268,7 +258,7 @@ const NEON = "#00FFB6";
 const NEON_48 = "rgba(0,255,182,0.48)";
 const NEON_22 = "rgba(0,255,182,0.22)";
 
-function HowWeHelp({ bigIcon, className = "" }: HowWeHelpProps) {
+function HowWeHelp({ className = "" }: HowWeHelpProps) {
   const tabs: Tab[] = useMemo(
     () => [
       {
@@ -276,40 +266,75 @@ function HowWeHelp({ bigIcon, className = "" }: HowWeHelpProps) {
         number: "01",
         label: "Content Creation",
         title: "Content Creation",
-        desc: "Our content creation process is a comprehensive, end-to-end engine designed to transform raw ideas into high-performing digital assets that resonate with your audience.",
-        bullets: ["Professional Video Production", "Custom Graphics & Animation", "Copywriting & Storytelling", "Brand Voice Development"],
+        desc: "Our content creation process is a comprehensive, end-to-end engine designed to transform raw ideas into high-performing digital assets.",
+        bullets: [
+          "Custom Design & Visuals",
+          "Social Media Management",
+          "Growth & Strategy",
+          "Analytics & Reporting",
+        ],
+        icon: "/howwehelp/content-creation.svg",
+        iconAlt: "Content Creation icon",
       },
       {
         id: "t2",
         number: "02",
         label: "Design",
-        title: "Design Excellence",
-        desc: "We craft stunning visual identities and user experiences that elevate your brand. From logos to complete design systems, every pixel is purposefully placed.",
-        bullets: ["Brand Identity & Logo Design", "UI/UX Design", "Marketing Materials", "Web & Mobile Design"],
+        title: "Design",
+        desc: "Our design process transforms ideas into clear, compelling visual systems that communicate your brand story and elevate your presence across all touchpoints.",
+        bullets: [
+          "Brand Identity & Visual Systems",
+          "Print & Digital Design",
+          "Presentation & Pitch Deck Design",
+          "Campaign & Event Materials",
+        ],
+        icon: "/howwehelp/design.svg",
+        iconAlt: "Design icon",
       },
       {
         id: "t3",
         number: "03",
-        label: "Social Media",
+        label: "Social Media Management",
         title: "Social Media Management",
-        desc: "Strategic social media management that builds communities, drives engagement, and converts followers into loyal customers across all major platforms.",
-        bullets: ["Platform Strategy & Planning", "Content Calendar Management", "Community Engagement", "Influencer Collaboration"],
+        desc: "Our social media management approach builds strong brand presence, meaningful engagement, and consistent communication across all platforms.",
+        bullets: [
+          "Content Planning & Scheduling",
+          "Visual Direction & Feed Design",
+          "Community Management",
+          "Performance Optimization",
+        ],
+        icon: "/howwehelp/social-media-management.svg",
+        iconAlt: "Social Media Management icon",
       },
       {
         id: "t4",
         number: "04",
-        label: "Growth",
+        label: "Growth & Strategy",
         title: "Growth & Strategy",
-        desc: "Data-driven growth strategies tailored to your business goals. We identify opportunities, optimize channels, and scale what works to maximize your ROI.",
-        bullets: ["Market Research & Analysis", "Audience Targeting", "Campaign Optimization", "Conversion Rate Optimization"],
+        desc: "Our growth and strategy framework aligns creative vision with business goals, turning insights into scalable brand success.",
+        bullets: [
+          "Brand Positioning & Messaging",
+          "Campaign Strategy & Planning",
+          "Audience Research & Market Insights",
+          "Conversion Optimization",
+        ],
+        icon: "/howwehelp/growth-strategy.svg",
+        iconAlt: "Growth & Strategy icon",
       },
       {
         id: "t5",
         number: "05",
-        label: "Analytics",
+        label: "Analytics & Reporting",
         title: "Analytics & Reporting",
-        desc: "Comprehensive analytics and transparent reporting that give you complete visibility into your campaign performance and business growth metrics.",
-        bullets: ["Performance Dashboards", "Custom Reports & Insights", "ROI Tracking", "Competitor Analysis"],
+        desc: "Our analytics and reporting system transforms data into actionable insights, helping you track performance, refine strategy, and scale with confidence.",
+        bullets: [
+          "Performance Dashboards",
+          "Campaign Analysis",
+          "Audience Behavior Reports",
+          "Data-Driven Recommendations",
+        ],
+        icon: "/howwehelp/analytics-reporting.svg",
+        iconAlt: "Analytics & Reporting icon",
       },
     ],
     []
@@ -318,6 +343,16 @@ function HowWeHelp({ bigIcon, className = "" }: HowWeHelpProps) {
   const [activeId, setActiveId] = useState<string>(tabs[0].id);
   const activeIndex = useMemo(() => tabs.findIndex((t) => t.id === activeId), [tabs, activeId]);
   const activeTab = tabs[activeIndex] ?? tabs[0];
+
+  const panelTransition = {
+    duration: 0.48,
+    ease: [0.22, 1, 0.36, 1] as const,
+  };
+
+  const columnTransition = {
+    duration: 0.62,
+    ease: "cubic-bezier(0.22, 1, 0.36, 1)",
+  };
 
   return (
     <section id="how-we-help" className={`relative w-full ${className}`} style={{ background: NAVY }}>
@@ -349,13 +384,13 @@ function HowWeHelp({ bigIcon, className = "" }: HowWeHelpProps) {
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={activeTab.id}
-                  initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
-                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                  className="absolute inset-0"
+                  initial={{ opacity: 0, scale: 0.985 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.985 }}
+                  transition={panelTransition}
+                  className="absolute inset-0 will-change-transform"
                 >
-                  <ActivePanel tab={activeTab} bigIcon={bigIcon} />
+                  <ActivePanel tab={activeTab} />
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -391,37 +426,50 @@ function HowWeHelp({ bigIcon, className = "" }: HowWeHelpProps) {
                 return (
                   <div
                     key={t.id}
-                    className="relative h-full transition-all duration-500 ease-out"
+                    className="relative h-full overflow-hidden will-change-[flex]"
                     style={{
-                      flex: isActive ? "1 1 0%" : "0 0 78px",
-                      minWidth: isActive ? "0" : "78px",
+                      flex: isActive ? "1 1 0%" : "0 0 58px",
+                      minWidth: isActive ? "0" : "58px",
+                      transitionProperty: "flex-basis, flex-grow, flex-shrink",
+                      transitionDuration: `${columnTransition.duration}s`,
+                      transitionTimingFunction: columnTransition.ease,
                     }}
                   >
-                    <AnimatePresence mode="wait" initial={false}>
-                      {isActive ? (
-                        <motion.div
-                          key={`${t.id}-active`}
-                          initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
-                          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                          exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
-                          transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                          className="absolute inset-0"
-                        >
-                          <ActivePanel tab={t} bigIcon={bigIcon} />
-                        </motion.div>
-                      ) : (
-                        <motion.div
-                          key={`${t.id}-closed`}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-                          className="absolute inset-0"
-                        >
-                          <ClosedColumn tab={t} onClick={() => setActiveId(t.id)} />
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                    <motion.div
+                      className="absolute inset-0"
+                      initial={false}
+                      animate={{
+                        opacity: isActive ? 1 : 0,
+                        scale: isActive ? 1 : 0.985,
+                      }}
+                      transition={panelTransition}
+                      style={{
+                        pointerEvents: isActive ? "auto" : "none",
+                        transformOrigin: "center center",
+                        willChange: "opacity, transform",
+                        zIndex: isActive ? 2 : 1,
+                      }}
+                    >
+                      <ActivePanel tab={t} />
+                    </motion.div>
+
+                    <motion.div
+                      className="absolute inset-0"
+                      initial={false}
+                      animate={{
+                        opacity: isActive ? 0 : 1,
+                        scale: isActive ? 0.985 : 1,
+                      }}
+                      transition={panelTransition}
+                      style={{
+                        pointerEvents: isActive ? "none" : "auto",
+                        transformOrigin: "center center",
+                        willChange: "opacity, transform",
+                        zIndex: isActive ? 1 : 2,
+                      }}
+                    >
+                      <ClosedColumn tab={t} onClick={() => setActiveId(t.id)} />
+                    </motion.div>
                   </div>
                 );
               })}
@@ -437,7 +485,7 @@ function HowWeHelp({ bigIcon, className = "" }: HowWeHelpProps) {
    Active Panel
 ========================= */
 
-function ActivePanel({ tab, bigIcon }: { tab: Tab; bigIcon?: React.ReactNode }) {
+function ActivePanel({ tab }: { tab: Tab }) {
   return (
     <div
       className="relative overflow-hidden h-full w-full rounded-[14px]"
@@ -449,17 +497,18 @@ function ActivePanel({ tab, bigIcon }: { tab: Tab; bigIcon?: React.ReactNode }) 
           "linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.00) 55%, rgba(0,0,0,0.06) 100%)",
       }}
     >
-      {/* Premium subtle sweep */}
       <motion.div
         aria-hidden="true"
-        className="absolute -inset-[60px] pointer-events-none opacity-[0.06]"
+        className="absolute -inset-[60px] pointer-events-none opacity-[0.05]"
         style={{
           background: "linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,255,182,0.75) 50%, rgba(0,0,0,0) 100%)",
           transform: "rotate(12deg)",
+          willChange: "transform",
         }}
-        animate={{ x: [-40, 40] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        animate={{ x: [-18, 18] }}
+        transition={{ duration: 8.5, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
       />
+
       <div className="absolute right-8 top-7 md:right-10 md:top-9">
         <span className="text-[18px] md:text-[22px] font-semibold tracking-wide" style={{ color: NEON }}>
           {tab.number}
@@ -496,11 +545,14 @@ function ActivePanel({ tab, bigIcon }: { tab: Tab; bigIcon?: React.ReactNode }) 
           </ul>
         )}
 
-        {bigIcon && (
-          <div className="pointer-events-none absolute bottom-7 right-7 md:bottom-10 md:right-10 h-[120px] w-[180px] md:h-[140px] md:w-[220px] opacity-90">
-            {bigIcon}
-          </div>
-        )}
+        <div className="pointer-events-none absolute bottom-7 right-7 md:bottom-10 md:right-10 h-[120px] w-[180px] md:h-[140px] md:w-[220px] opacity-90">
+          <Image
+            src={tab.icon}
+            alt={tab.iconAlt}
+            fill
+            className="object-contain object-right-bottom"
+          />
+        </div>
       </div>
     </div>
   );
@@ -515,7 +567,7 @@ function ClosedColumn({ tab, onClick }: { tab: Tab; onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="group relative w-full h-full overflow-hidden rounded-[14px] cursor-pointer transition-all duration-300 hover:scale-[1.02]"
+      className="group relative w-full h-full overflow-hidden rounded-[14px] cursor-pointer transition-transform duration-200 ease-out hover:scale-[1.01]"
       style={{
         border: `1px solid ${NEON_22}`,
         background:
@@ -523,28 +575,25 @@ function ClosedColumn({ tab, onClick }: { tab: Tab; onClick: () => void }) {
           "linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.00) 70%)",
       }}
     >
-      {/* Hover glow */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-40 transition-opacity duration-300 rounded-[14px]"
+        className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-40 transition-opacity duration-200 rounded-[14px]"
         style={{
           background: `radial-gradient(circle at center, ${NEON_22} 0%, transparent 70%)`,
         }}
       />
 
-      {/* Number at top */}
-      <div className="absolute left-1/2 -translate-x-1/2 top-8 transition-all duration-300 group-hover:-translate-y-1">
+      <div className="absolute left-1/2 -translate-x-1/2 top-8 transition-transform duration-200 ease-out group-hover:-translate-y-0.5">
         <span
-          className="text-[18px] md:text-[22px] font-semibold tracking-wide transition-colors duration-300 group-hover:text-[#00FFB6]"
+          className="text-[18px] md:text-[22px] font-semibold tracking-wide transition-colors duration-200 group-hover:text-[#00FFB6]"
           style={{ color: NEON_48 }}
         >
           {tab.number}
         </span>
       </div>
 
-      {/* Vertical label */}
       <div className="absolute inset-0 flex items-center justify-center">
         <span
-          className="whitespace-nowrap text-[18px] md:text-[22px] font-medium transition-colors duration-300 group-hover:text-[#00FFB6]"
+          className="whitespace-nowrap text-[18px] md:text-[22px] font-medium transition-colors duration-200 group-hover:text-[#00FFB6]"
           style={{
             writingMode: "vertical-rl",
             transform: "rotate(180deg)",
