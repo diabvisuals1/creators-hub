@@ -10,6 +10,7 @@ type Project = {
   video: string;
   subtitle?: string;
   paragraphs?: string[];
+  poster: string;
   thumbs?: string[];
 };
 
@@ -33,6 +34,44 @@ function fmtTime(sec: number) {
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
+function ThumbImage({
+  src,
+  alt = "",
+  className = "",
+}: {
+  src?: string;
+  alt?: string;
+  className?: string;
+}) {
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setFailed(false);
+  }, [src]);
+
+  if (!src || failed) {
+    return (
+      <div
+        className={className}
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(250,230,175,0.95) 0%, rgba(220,185,120,0.95) 100%)",
+        }}
+      />
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      draggable={false}
+      onError={() => setFailed(true)}
+      className={className}
+    />
+  );
+}
+
 export default function SelectedProjects() {
   const projects: Project[] = useMemo(
     () => [
@@ -45,6 +84,7 @@ export default function SelectedProjects() {
           "In this collaboration, our design team spearheaded the creative development and technical execution for Kai Cenat’s signature apparel line.",
           "Our work focused on bridging the gap between high-energy creator culture and premium streetwear aesthetics.",
         ],
+        poster: "/projects/thumbs/t1.jpg",
         thumbs: [
           "/projects/thumbs/t1.jpg",
           "/projects/thumbs/t2.jpg",
@@ -59,24 +99,60 @@ export default function SelectedProjects() {
         label: "PROJECT TWO / PROMO",
         video: "/projects/p2.mp4",
         subtitle: "[SELECTED PROJECTS]",
+        poster: "/projects/thumbs/t2.jpg",
+        thumbs: [
+          "/projects/thumbs/t2.jpg",
+          "/projects/thumbs/t1.jpg",
+          "/projects/thumbs/t3.jpg",
+          "/projects/thumbs/t4.jpg",
+          "/projects/thumbs/t5.jpg",
+          "/projects/thumbs/t6.jpg",
+        ],
       },
       {
         id: "p3",
         label: "PROJECT THREE / CAMPAIGN",
         video: "/projects/p3.mp4",
         subtitle: "[SELECTED PROJECTS]",
+        poster: "/projects/thumbs/t3.jpg",
+        thumbs: [
+          "/projects/thumbs/t3.jpg",
+          "/projects/thumbs/t1.jpg",
+          "/projects/thumbs/t2.jpg",
+          "/projects/thumbs/t4.jpg",
+          "/projects/thumbs/t5.jpg",
+          "/projects/thumbs/t6.jpg",
+        ],
       },
       {
         id: "p4",
         label: "PROJECT FOUR / EDIT",
         video: "/projects/p4.mp4",
         subtitle: "[SELECTED PROJECTS]",
+        poster: "/projects/thumbs/t4.jpg",
+        thumbs: [
+          "/projects/thumbs/t4.jpg",
+          "/projects/thumbs/t1.jpg",
+          "/projects/thumbs/t2.jpg",
+          "/projects/thumbs/t3.jpg",
+          "/projects/thumbs/t5.jpg",
+          "/projects/thumbs/t6.jpg",
+        ],
       },
       {
         id: "p5",
         label: "PROJECT FIVE / SHORT",
         video: "/projects/p5.mp4",
         subtitle: "[SELECTED PROJECTS]",
+        poster: "/projects/thumbs/t5.jpg",
+        thumbs: [
+          "/projects/thumbs/t5.jpg",
+          "/projects/thumbs/t1.jpg",
+          "/projects/thumbs/t2.jpg",
+          "/projects/thumbs/t3.jpg",
+          "/projects/thumbs/t4.jpg",
+          "/projects/thumbs/t6.jpg",
+        ],
       },
     ],
     []
@@ -86,6 +162,11 @@ export default function SelectedProjects() {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const active = projects[index];
+  const activePoster = active.poster;
+  const activeThumbs =
+    active.thumbs && active.thumbs.length > 0
+      ? active.thumbs
+      : [active.poster];
 
   const go = useCallback(
     (nextDir: 1 | -1) => {
@@ -260,17 +341,12 @@ export default function SelectedProjects() {
           <div
             className="
               relative z-20
-              w-full
-              px-4 sm:px-6
-              text-[#151A43]
-              text-center
-              flex flex-col items-center
-              lg:w-[390px] lg:shrink-0
-              lg:items-start lg:text-left
-              lg:pl-[max(54px,calc((100vw-1152px)/2+54px))]
+              flex w-full flex-col items-center
+              px-4 text-center text-[#151A43]
+              sm:px-6
+              lg:w-[390px] lg:shrink-0 lg:items-start lg:pl-[max(54px,calc((100vw-1152px)/2+54px))] lg:text-left
             "
           >
-            {/* plus decoration - starts from same container line */}
             <div className="pointer-events-none absolute left-0 top-1/2 hidden -translate-x-[118px] -translate-y-1/2 lg:block">
               <img
                 src="/hero/svg/plus.svg"
@@ -309,7 +385,7 @@ export default function SelectedProjects() {
             </div>
 
             <motion.h2
-              className="mt-8 font-bold leading-[0.94] tracking-tight text-[#151A43] text-[clamp(40px,5vw,66px)]"
+              className="mt-8 text-[clamp(40px,5vw,66px)] font-bold leading-[0.94] tracking-tight text-[#151A43]"
               initial={popIn(0.08).initial}
               animate={popIn(0.08).animate}
               transition={popIn(0.08).transition}
@@ -403,6 +479,22 @@ export default function SelectedProjects() {
                     onPointerUp={onCardPointerUp}
                     onPointerCancel={onCardPointerUp}
                   >
+                    {/* single poster only for this card */}
+                    <ThumbImage
+                      src={activePoster}
+                      alt={active.label}
+                      className="absolute inset-0 h-full w-full object-cover select-none"
+                    />
+
+                    <div
+                      aria-hidden="true"
+                      className="absolute inset-0"
+                      style={{
+                        background:
+                          "linear-gradient(180deg, rgba(10,12,24,0.06) 0%, rgba(10,12,24,0.10) 32%, rgba(10,12,24,0.22) 58%, rgba(10,12,24,0.52) 100%)",
+                      }}
+                    />
+
                     <button
                       data-play-btn
                       type="button"
@@ -477,6 +569,7 @@ export default function SelectedProjects() {
             <video
               ref={videoRef}
               src={active.video}
+              poster={activePoster}
               className="absolute inset-0 h-full w-full object-cover"
               playsInline
               muted={muted}
@@ -535,19 +628,18 @@ export default function SelectedProjects() {
 
                 <div className="flex-1 overflow-hidden">
                   <div className="flex items-center gap-3">
-                    {(active.thumbs ?? []).slice(0, 7).map((src, i) => (
-                      <img
+                    {activeThumbs.slice(0, 7).map((src, i) => (
+                      <div
                         key={src + i}
-                        src={src}
-                        alt=""
-                        draggable={false}
-                        className="h-[48px] w-[74px] object-cover"
+                        className="h-[48px] w-[74px] overflow-hidden"
                         style={{
                           borderRadius: 6,
                           boxShadow: "0 10px 26px rgba(0,0,0,0.35)",
                           opacity: i === 0 ? 1 : 0.9,
                         }}
-                      />
+                      >
+                        <ThumbImage src={src} />
+                      </div>
                     ))}
                   </div>
                 </div>
