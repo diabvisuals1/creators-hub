@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import Navbar from "@/components/sections/Navbar";
-import { FiSearch } from "react-icons/fi";
+import { FiSearch, FiChevronRight } from "react-icons/fi";
 import { motion } from "framer-motion";
 
 const popIn = (delay = 0) => ({
@@ -58,6 +60,119 @@ function useTypeLoop(words: string[]) {
   return text;
 }
 
+const companyLogos = [
+  {
+    name: "Mr Beast",
+    src: "/hero/logos/mrbeast.svg",
+    width: 170,
+    height: 42,
+    mobileWidth: 130,
+  },
+  {
+    name: "Bumble",
+    src: "/hero/logos/bumble.svg",
+    width: 130,
+    height: 32,
+    mobileWidth: 102,
+  },
+  {
+    name: "Schibsted",
+    src: "/hero/logos/schibsted.svg",
+    width: 138,
+    height: 32,
+    mobileWidth: 108,
+  },
+  {
+    name: "Opera",
+    src: "/hero/logos/opera.svg",
+    width: 118,
+    height: 36,
+    mobileWidth: 92,
+  },
+  {
+    name: "Bonterra",
+    src: "/hero/logos/bonterra.svg",
+    width: 142,
+    height: 34,
+    mobileWidth: 110,
+  },
+  {
+    name: "Zoom",
+    src: "/hero/logos/zoom.svg",
+    width: 118,
+    height: 30,
+    mobileWidth: 92,
+  },
+];
+
+function HeroLogosBar() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.34, duration: 0.6, ease: "easeOut" }}
+      className="relative z-30 border-t border-[#151A43]/12 bg-white"
+    >
+      <div className="mx-auto w-full max-w-[1240px] px-4 sm:px-6">
+        <div
+          className="
+            flex flex-wrap items-center justify-center
+            gap-x-8 gap-y-5
+            py-5
+            sm:justify-between sm:gap-x-6 sm:py-6
+            md:py-7
+          "
+        >
+          {companyLogos.map((logo, index) => (
+            <motion.div
+              key={logo.name}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                delay: 0.42 + index * 0.05,
+                duration: 0.4,
+                ease: "easeOut",
+              }}
+              whileHover={{
+                y: -3,
+                scale: 1.045,
+              }}
+              className="
+                group
+                flex cursor-default items-center justify-center
+                opacity-100
+                transition-transform duration-300
+              "
+              aria-label={logo.name}
+            >
+              <div
+                className="relative flex items-center justify-center"
+                style={{
+                  width: `clamp(${logo.mobileWidth}px, 10vw, ${logo.width}px)`,
+                  height: "42px",
+                }}
+              >
+                <Image
+                  src={logo.src}
+                  alt={logo.name}
+                  width={logo.width}
+                  height={logo.height}
+                  className="
+                    h-auto w-full object-contain
+                    transition-transform duration-300
+                    group-hover:scale-[1.04]
+                  "
+                  draggable={false}
+                />
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function Hero() {
   const typed = useTypeLoop(["WELCOME"]);
 
@@ -71,19 +186,18 @@ export default function Hero() {
         backgroundRepeat: "no-repeat",
       }}
     >
-      <div className="relative z-10 w-full px-4 sm:px-6 pt-4 sm:pt-6">
+      <div className="relative z-10 w-full px-4 pt-4 sm:px-6 sm:pt-6">
         <div className="mx-auto w-full max-w-[1240px]">
           <Navbar />
         </div>
 
-        {/* ✅ Layout: content في النص + padding يحجز مساحة للـ icons */}
-        <div className="relative mt-6 sm:mt-10 min-h-[640px] sm:min-h-[700px] w-full">
-          {/* Plus strips */}
+        <div className="relative mt-6 w-full sm:mt-10">
+          {/* plus lines */}
           <div className="pointer-events-none absolute inset-0 z-20">
-            <div className="mx-auto h-full w-full max-w-[1240px] relative">
+            <div className="relative mx-auto h-full w-full max-w-[1240px]">
               <span
                 aria-hidden="true"
-                className="absolute left-0 top-[20px] bottom-[20px] w-[20px]"
+                className="absolute bottom-[20px] left-0 top-[20px] w-[20px]"
                 style={{
                   backgroundImage: "url('/hero/svg/plus.svg')",
                   backgroundSize: "contain",
@@ -93,7 +207,7 @@ export default function Hero() {
               />
               <span
                 aria-hidden="true"
-                className="absolute right-0 top-[20px] bottom-[20px] w-[20px]"
+                className="absolute bottom-[20px] right-0 top-[20px] w-[20px]"
                 style={{
                   backgroundImage: "url('/hero/svg/plus.svg')",
                   backgroundSize: "contain",
@@ -104,12 +218,12 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* ✅ Floating icons: 4 corners حوالين النص */}
+          {/* floating icons */}
           <div className="pointer-events-none absolute inset-0 z-10">
-            <div className="mx-auto h-full w-full max-w-[1240px] relative">
-              {/* TOP LEFT (TARGET) */}
+            <div className="relative mx-auto h-full w-full max-w-[1240px]">
+              {/* top left target */}
               <motion.div
-                className="absolute left-[14px] sm:left-[70px] top-[120px] sm:top-[120px] will-change-transform"
+                className="absolute left-[14px] top-[120px] will-change-transform sm:left-[70px] sm:top-[120px]"
                 style={{
                   width: "clamp(34px, 9vw, 60px)",
                   height: "clamp(34px, 9vw, 60px)",
@@ -128,12 +242,12 @@ export default function Hero() {
                 />
               </motion.div>
 
-              {/* BOTTOM LEFT (ROCKET) */}
+              {/* bottom left rocket */}
               <motion.div
-                className="absolute left-[-10px] sm:left-[40px] bottom-[50px] sm:bottom-[70px] will-change-transform"
+                className="absolute bottom-[118px] left-[6px] will-change-transform sm:bottom-[138px] sm:left-[34px]"
                 style={{
-                  width: "clamp(130px, 34vw, 210px)",
-                  height: "clamp(130px, 34vw, 210px)",
+                  width: "clamp(110px, 22vw, 185px)",
+                  height: "clamp(110px, 22vw, 185px)",
                 }}
                 initial={popIn(0.28).initial}
                 animate={popIn(0.28).animate}
@@ -149,12 +263,12 @@ export default function Hero() {
                 />
               </motion.div>
 
-              {/* BOTTOM RIGHT (BULB) */}
+              {/* bottom right bulb */}
               <motion.div
-                className="absolute right-[-8px] sm:right-[70px] bottom-[60px] sm:bottom-[80px] will-change-transform"
+                className="absolute bottom-[122px] right-[10px] will-change-transform sm:bottom-[145px] sm:right-[62px]"
                 style={{
-                  width: "clamp(92px, 26vw, 150px)",
-                  height: "clamp(92px, 26vw, 150px)",
+                  width: "clamp(74px, 12vw, 120px)",
+                  height: "clamp(74px, 12vw, 120px)",
                 }}
                 initial={popIn(0.34).initial}
                 animate={popIn(0.34).animate}
@@ -172,30 +286,32 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* ✅ Center content: في النص بالظبط + padding يبعده عن الزوايا */}
+          {/* center content */}
           <div className="relative z-30 mx-auto w-full max-w-[1240px] px-2 sm:px-6">
             <div
               className="
-                min-h-[640px] sm:min-h-[700px]
-                flex items-center justify-center
-                text-center
-                px-6 sm:px-14
-                pt-10
-                pb-10
+                flex min-h-[540px] items-center justify-center
+                px-6 pt-10 text-center
+                sm:min-h-[620px] sm:px-14
+                md:min-h-[640px]
               "
               style={{
-                // يحجز مساحة للـ icons فوق/تحت + جوانب
                 paddingTop: "clamp(70px, 11vw, 120px)",
-                paddingBottom: "clamp(90px, 16vw, 160px)",
+                paddingBottom: "clamp(92px, 12vw, 120px)",
               }}
             >
               <div className="flex flex-col items-center">
-                {/* WELCOME typing pill */}
+                {/* welcome pill */}
                 <motion.div
                   initial={{ opacity: 0, y: 14, scale: 0.98 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ delay: 0.08, type: "spring", stiffness: 160, damping: 18 }}
-                  className="mb-5 sm:mb-6 inline-flex items-center gap-2 rounded-full bg-white/60 px-4 py-2 text-[10px] sm:text-[11px] font-semibold tracking-[0.14em] text-[#151A43] backdrop-blur"
+                  transition={{
+                    delay: 0.08,
+                    type: "spring",
+                    stiffness: 160,
+                    damping: 18,
+                  }}
+                  className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/55 px-4 py-2 text-[10px] font-semibold tracking-[0.14em] text-[#151A43] backdrop-blur sm:mb-6 sm:text-[11px]"
                 >
                   <span>(</span>
 
@@ -210,67 +326,83 @@ export default function Hero() {
                   </span>
 
                   <span>)</span>
-                  <span className="text-[13px] sm:text-[14px] leading-none">→</span>
                 </motion.div>
 
                 <motion.h1
                   initial={{ opacity: 0, y: 18 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.14, type: "spring", stiffness: 140, damping: 18 }}
+                  transition={{
+                    delay: 0.14,
+                    type: "spring",
+                    stiffness: 140,
+                    damping: 18,
+                  }}
                   className="max-w-[980px] text-[#151A43]"
                 >
-                  <span className="block text-[34px] sm:text-[52px] md:text-[66px] leading-[1.02] tracking-[-0.01em]">
-                    <span className="font-head">YOUR CREATIVE </span>
-                    <span className="font-bold">VISION,</span>
+                  <span className="block text-[34px] leading-[1.02] tracking-[-0.01em] sm:text-[52px] md:text-[66px]">
+                    <span className="font-head">CREATORS HUB </span>
+                    <span className="font-bold">- YOUR</span>
                   </span>
 
-                  <span className="block text-[34px] sm:text-[52px] md:text-[66px] leading-[1.02] tracking-[-0.01em] font-bold">
-                    BROUGHT TO LIFE
+                  <span className="block text-[34px] font-bold leading-[1.02] tracking-[-0.01em] sm:text-[52px] md:text-[66px]">
+                    CONTENT, FULLY MANAGED
                   </span>
                 </motion.h1>
 
                 <motion.p
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2, type: "spring", stiffness: 140, damping: 18 }}
-                  className="mt-5 sm:mt-6 max-w-[560px] text-[14px] sm:text-[18px] leading-[1.6] font-medium text-[#151A43]/85 px-2"
+                  transition={{
+                    delay: 0.2,
+                    type: "spring",
+                    stiffness: 140,
+                    damping: 18,
+                  }}
+                  className="mt-5 max-w-[620px] px-2 text-[14px] font-medium leading-[1.6] text-[#151A43]/85 sm:mt-6 sm:text-[18px]"
                 >
-                  A full-service creative agency delivering professional video editing, social media management, stunning design, and content creation for brands and businesses of all sizes.
+                  From roadmap design to global scaling, we handle your entire content lifecycle.
                 </motion.p>
 
                 <motion.div
                   initial={{ opacity: 0, y: 18, scale: 0.98 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ delay: 0.26, type: "spring", stiffness: 160, damping: 18 }}
-                  className="mt-7 sm:mt-9 flex items-center gap-3"
+                  transition={{
+                    delay: 0.26,
+                    type: "spring",
+                    stiffness: 160,
+                    damping: 18,
+                  }}
+                  className="mt-7 flex items-center gap-3 sm:mt-9"
                 >
-                  <motion.button
-                    type="button"
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="h-[48px] sm:h-[54px] rounded-[10px] bg-[#FF1E1E] px-6 sm:px-8 text-[13px] sm:text-[14px] font-medium text-white"
-                  >
-                    Search Creator
-                  </motion.button>
+                  <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                    <Link
+                      href="/contact"
+                      className="flex h-[48px] items-center justify-center rounded-[8px] bg-[#FF1E1E] px-6 text-[13px] font-semibold text-white transition-shadow duration-300 hover:shadow-[0_10px_30px_rgba(255,30,30,0.22)] sm:h-[54px] sm:px-8 sm:text-[14px]"
+                    >
+                      Scale My Content
+                    </Link>
+                  </motion.div>
 
-                  <motion.button
-                    type="button"
-                    aria-label="Search"
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="h-[48px] w-[48px] sm:h-[54px] sm:w-[54px] rounded-[10px] bg-[#FF1E1E] text-white flex items-center justify-center"
-                  >
-                    <FiSearch className="text-[16px] sm:text-[18px]" />
-                  </motion.button>
+                  <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                    <Link
+                      href="/search"
+                      aria-label="Search"
+                      className="flex h-[48px] w-[48px] items-center justify-center rounded-[8px] bg-[#FF1E1E] text-white transition-shadow duration-300 hover:shadow-[0_10px_30px_rgba(255,30,30,0.22)] sm:h-[54px] sm:w-[54px]"
+                    >
+                      <FiChevronRight className="text-[18px] sm:text-[20px]" />
+                    </Link>
+                  </motion.div>
                 </motion.div>
               </div>
             </div>
           </div>
 
-          {/* Fade */}
-          <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-[160px] z-0 bg-gradient-to-b from-white/0 via-white/75 to-white" />
+          {/* fade before logos bar */}
+          <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-0 h-[110px] bg-gradient-to-b from-white/0 via-white/70 to-white" />
         </div>
       </div>
+
+      <HeroLogosBar />
     </section>
   );
 }
