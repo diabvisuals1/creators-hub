@@ -49,7 +49,7 @@ export default function Footer() {
               max-[767px]:px-[18px] max-[767px]:pt-[16px] max-[767px]:pb-[16px]
             "
           >
-            <div className="flex items-center justify-center">
+            <div className="mt-[15px] flex items-center justify-center">
               <img
                 src="/footer/logo.svg"
                 alt="Creators Hub"
@@ -58,60 +58,124 @@ export default function Footer() {
               />
             </div>
 
-            <div className="mt-[18px] space-y-[14px] max-[767px]:mt-[14px] max-[767px]:space-y-[12px]">
-              <ActionButton bg="#E63A3A" ariaLabel="Email" />
-              <ActionButton bg="#1DB954" ariaLabel="WhatsApp" />
-              <ActionButton bg="#141B4D" ariaLabel="Phone" />
+            <div className="mt-[35px] flex flex-col gap-[8px] max-[767px]:mt-[14px]">
+              <ActionButton
+                href="mailto:hello@creatorshub.com"
+                bg="#E63A3A"
+                ariaLabel="Email"
+                iconSrc="/footer/mail.svg"
+              />
+              <ActionButton
+                href="https://wa.me/201000000000"
+                bg="#1DB954"
+                ariaLabel="WhatsApp"
+                iconSrc="/footer/mail.svg"
+                target="_blank"
+                rel="noreferrer"
+              />
+              <ActionButton
+                href="tel:+201000000000"
+                bg="#141B4D"
+                ariaLabel="Phone"
+                iconSrc="/footer/mail.svg"
+              />
             </div>
           </div>
         </div>
       </div>
 
-      {/* ===================== RED SECTION (454px) SPLIT IN 2 ===================== */}
-      <div className="w-full bg-[#BC1E3C] h-[454px] overflow-hidden max-[1023px]:h-auto">
-        {/* TOP HALF (no background stroke) */}
-        <div className="mx-auto w-full max-w-[1180px] px-4 h-1/2 max-[1023px]:h-auto">
+      {/* ===================== RED SECTION ===================== */}
+      <div className="w-full overflow-hidden bg-[#BC1E3C] max-[1023px]:h-auto">
+        {/* TOP PART */}
+        <div className="mx-auto h-[185px] w-full max-w-[1180px] px-4 max-[1023px]:h-auto">
           <div
-            className="pt-[44px] max-[1023px]:pt-[40px] max-[767px]:pt-[34px]"
+            className="pt-[44px] max-[1023px]:py-[40px] max-[767px]:py-[34px]"
             style={{ fontFamily: "var(--font-kollektif)" }}
           >
-            <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between">
-              <p className="max-w-[520px] text-white text-[24px] leading-[1.18] max-[767px]:text-[20px]">
-                We are engineering high-impact <br className="hidden sm:block" />
+            <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between max-[767px]:items-center max-[767px]:text-center">
+              <p className="max-w-[520px] text-[24px] leading-[1.18] text-white max-[767px]:text-[20px]">
+                We are engineering high-impact <br className="hidden sm:block max-[767px]:hidden" />
                 content for world’s leading brands
               </p>
 
-              <div className="flex items-start gap-10 lg:gap-14 max-[767px]:flex-col max-[767px]:gap-8">
-                <div className="hidden lg:block h-[116px] w-[1px] bg-white/12" />
+              <div className="flex items-start gap-10 lg:gap-14 max-[767px]:flex-col max-[767px]:items-center max-[767px]:gap-8">
+                <div className="hidden h-[116px] w-[1px] bg-white/12 lg:block" />
 
-                <div className="flex gap-10 lg:gap-14 max-[767px]:gap-12">
+                <div className="flex gap-10 lg:gap-14 max-[767px]:flex-col max-[767px]:items-center max-[767px]:gap-8 max-[767px]:text-center">
                   <div>
-                    <div className="text-white/70 text-[10px] tracking-[0.16em]">
-                      NAVIGATE
-                    </div>
-                    <ul className="mt-4 space-y-2 text-white text-[12px]">
-                      <li>Our Work</li>
-                      <li>Services</li>
-                      <li>About Us</li>
-                      <li>Testimonials</li>
+                    <div className="text-[10px] tracking-[0.16em] text-white/70">NAVIGATE</div>
+                    <ul className="mt-4 space-y-2 text-[12px]">
+                      <li>
+                        <a
+                          href="#our-work"
+                          className="text-white transition-opacity duration-200 hover:opacity-75 focus:opacity-75 focus:outline-none"
+                        >
+                          Our Work
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          href="#services"
+                          className="text-white transition-opacity duration-200 hover:opacity-75 focus:opacity-75 focus:outline-none"
+                        >
+                          Services
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          href="#about-us"
+                          className="text-white transition-opacity duration-200 hover:opacity-75 focus:opacity-75 focus:outline-none"
+                        >
+                          About Us
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          href="#testimonials"
+                          className="text-white transition-opacity duration-200 hover:opacity-75 focus:opacity-75 focus:outline-none"
+                        >
+                          Testimonials
+                        </a>
+                      </li>
                     </ul>
                   </div>
 
                   <div>
-                    <div className="text-white/70 text-[10px] tracking-[0.16em]">
-                      CONNECT
-                    </div>
-                    <ul className="mt-4 space-y-2 text-white text-[12px]">
-                      <li>Email</li>
-                      <li>WhatsApp</li>
-                      <li>Phone Number</li>
+                    <div className="text-[10px] tracking-[0.16em] text-white/70">CONNECT</div>
+                    <ul className="mt-4 space-y-2 text-[12px]">
+                      <li>
+                        <a
+                          href="mailto:hello@creatorshub.com"
+                          className="text-white transition-opacity duration-200 hover:opacity-75 focus:opacity-75 focus:outline-none"
+                        >
+                          Email
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          href="https://wa.me/201000000000"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-white transition-opacity duration-200 hover:opacity-75 focus:opacity-75 focus:outline-none"
+                        >
+                          WhatsApp
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          href="tel:+201000000000"
+                          className="text-white transition-opacity duration-200 hover:opacity-75 focus:opacity-75 focus:outline-none"
+                        >
+                          Phone Number
+                        </a>
+                      </li>
                     </ul>
                   </div>
 
                   <button
                     type="button"
                     onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                    className="ml-2 flex h-[34px] w-[34px] items-center justify-center rounded-[8px] bg-white/10 text-white hover:bg-white/15 max-[767px]:ml-0"
+                    className="ml-2 flex h-[34px] w-[34px] items-center justify-center rounded-[8px] bg-white/10 text-white transition-colors duration-200 hover:bg-white/15 max-[767px]:ml-0"
                     aria-label="Back to top"
                   >
                     <UpIcon />
@@ -122,28 +186,22 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* BOTTOM HALF (has background stroke) */}
-        <div className="relative h-1/2 max-[1023px]:h-auto">
-          {/* stroke background for bottom half only */}
-          <img
-            src="/footer/brand-stroke.svg"
-            alt=""
-            draggable={false}
-            className="
-              pointer-events-none select-none
-              absolute inset-0 z-0
-              w-full h-full
-              object-cover object-bottom
-            "
-          />
+        {/* BOTTOM PART */}
+        <div className="relative h-[255px] w-full max-[1023px]:h-auto">
+          {/* divider line */}
+          <div className="absolute left-0 top-0 z-[1] h-[35px] w-full bg-[#C62245] max-[1023px]:h-[28px] max-[767px]:h-[18px]" />
 
-          <div className="relative z-[2] mx-auto w-full max-w-[1180px] px-4 h-full flex flex-col justify-end pb-[52px] max-[1023px]:pt-[26px] max-[1023px]:pb-[40px]">
+          <div className="relative z-[2] mx-auto flex h-full w-full max-w-[1180px] flex-col px-4 pt-[56px] pb-[18px] max-[1023px]:pt-[52px] max-[1023px]:pb-[28px] max-[767px]:items-center max-[767px]:pt-[34px] max-[767px]:pb-[20px] max-[767px]:text-center">
             <div
               className="
+                select-none
                 text-white font-normal tracking-[0]
-                text-[199.44px] leading-[269.2px]
-                max-[1023px]:text-[140px] max-[1023px]:leading-[190px]
-                max-[767px]:text-[72px]  max-[767px]:leading-[96px]
+                text-[182px] leading-[0.88]
+                max-[1180px]:text-[15vw]
+                max-[1023px]:text-[118px]
+                max-[1023px]:leading-[0.9]
+                max-[767px]:text-[64px]
+                max-[767px]:leading-[0.92]
               "
               style={{ fontFamily: "var(--font-godber), Godber, serif" }}
             >
@@ -151,7 +209,7 @@ export default function Footer() {
             </div>
 
             <div
-              className="mt-[8px] text-white/75 text-[10px]"
+              className="mt-auto text-[10px] text-white/75"
               style={{ fontFamily: "var(--font-kollektif)" }}
             >
               © 2026 CREATORS HUB. ALL RIGHTS RESERVED.
@@ -163,47 +221,44 @@ export default function Footer() {
   );
 }
 
-function ActionButton({ bg, ariaLabel }: { bg: string; ariaLabel: string }) {
+function ActionButton({
+  bg,
+  ariaLabel,
+  iconSrc,
+  href,
+  target,
+  rel,
+}: {
+  bg: string;
+  ariaLabel: string;
+  iconSrc: string;
+  href: string;
+  target?: string;
+  rel?: string;
+}) {
   return (
-    <button
-      type="button"
+    <a
+      href={href}
       aria-label={ariaLabel}
-      className="flex w-full items-center justify-center rounded-[8px] h-[48px] max-[767px]:h-[44px]"
+      target={target}
+      rel={rel}
+      className="flex w-full items-center justify-center rounded-[8px] h-[60px]"
       style={{ backgroundColor: bg }}
     >
-      <MailIcon />
-    </button>
-  );
-}
-
-function MailIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M4.5 7.5H19.5V16.5H4.5V7.5Z"
-        stroke="white"
-        strokeWidth="1.8"
-        strokeLinejoin="round"
+      <img
+        src={iconSrc}
+        alt=""
+        draggable={false}
+        className="h-[24px] w-[24px] select-none pointer-events-none object-contain"
       />
-      <path
-        d="M5 8L12 13L19 8"
-        stroke="white"
-        strokeWidth="1.8"
-        strokeLinejoin="round"
-      />
-    </svg>
+    </a>
   );
 }
 
 function UpIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M12 5l-7 7M12 5l7 7"
-        stroke="white"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
+      <path d="M12 5l-7 7M12 5l7 7" stroke="white" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }
