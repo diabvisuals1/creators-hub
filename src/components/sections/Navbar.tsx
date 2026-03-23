@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { FiArrowRight, FiMenu, FiX } from "react-icons/fi";
@@ -305,34 +306,37 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* WhatsApp Floating Button */}
-      <motion.a
-        href={whatsappHref}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Chat on WhatsApp"
-        initial={{ opacity: 0, scale: 0.8, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ delay: 0.25, duration: 0.35 }}
-        whileHover={{ scale: 1.08 }}
-        whileTap={{ scale: 0.94 }}
-        className="
-          fixed
-          bottom-5 right-5
-          z-[1000000000000000000]
-          flex items-center justify-center
-          h-[56px] w-[56px]
-          rounded-full
-          bg-[#25D366]
-          text-white
-          shadow-[0_10px_30px_rgba(37,211,102,0.35)]
-          transition-all duration-300
-          hover:shadow-[0_14px_38px_rgba(37,211,102,0.45)]
-          sm:bottom-6 sm:right-6
-        "
-      >
-        <FaWhatsapp className="text-[30px]" />
-      </motion.a>
+      {mounted &&
+        createPortal(
+          <motion.a
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Chat on WhatsApp"
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ delay: 0.25, duration: 0.35 }}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.94 }}
+            className="
+              fixed
+              bottom-5 right-5
+              flex items-center justify-center
+              h-[56px] w-[56px]
+              rounded-full
+              bg-[#25D366]
+              text-white
+              shadow-[0_10px_30px_rgba(37,211,102,0.35)]
+              transition-all duration-300
+              hover:shadow-[0_14px_38px_rgba(37,211,102,0.45)]
+              sm:bottom-6 sm:right-6
+            "
+            style={{ zIndex: 2147483647 }}
+          >
+            <FaWhatsapp className="text-[30px]" />
+          </motion.a>,
+          document.body
+        )}
     </>
   );
 }
