@@ -45,14 +45,6 @@ const cairo = Cairo({
 export const metadata: Metadata = {
   title: "Creators Hub",
   description: "Creators Hub — Social Media Agency",
-  icons: {
-    icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/favicon.ico", sizes: "any" },
-    ],
-    apple: "/apple-touch-icon.png",
-    shortcut: "/favicon.ico",
-  },
 };
 
 export default function RootLayout({
