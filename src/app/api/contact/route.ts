@@ -40,8 +40,8 @@ export async function POST(request: Request) {
     }
 
     const apiKey = "re_ZbCYR9eb_8isJXmuBufeFbrAZ8Ck2gGqZ";
-    const toEmail = process.env.CONTACT_TO_EMAIL;
-    const fromEmail = process.env.CONTACT_FROM_EMAIL;
+    const toEmail = "omar.diab.work@gmail.com";
+    const fromEmail = "onboarding@resend.dev";
 
     if (!apiKey || !toEmail || !fromEmail) {
       return NextResponse.json(
