@@ -8,16 +8,106 @@ const YELLOW = "#F3FF00";
 const NAVY = "#151A43";
 const RED = "#FF1E1E";
 
-export default function ContactUs() {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
+type FormState = {
+  name: string;
+  email: string;
+  message: string;
+};
 
-  function onChange<K extends keyof typeof form>(key: K, val: string) {
+type StatusState = {
+  type: "idle" | "success" | "error";
+  message: string;
+};
+
+export default function ContactUs() {
+  const [form, setForm] = useState<FormState>({
+    name: "",
+    email: "",
+    message: "",
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [status, setStatus] = useState<StatusState>({
+    type: "idle",
+    message: "",
+  });
+
+  function onChange<K extends keyof FormState>(key: K, val: string) {
     setForm((p) => ({ ...p, [key]: val }));
   }
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    console.log("Contact form:", form);
+
+    if (isSubmitting) return;
+
+    const payload = {
+      name: form.name.trim(),
+      email: form.email.trim(),
+      message: form.message.trim(),
+    };
+
+    if (!payload.name || !payload.email || !payload.message) {
+      setStatus({
+        type: "error",
+        message: "Please fill in all required fields.",
+      });
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(payload.email)) {
+      setStatus({
+        type: "error",
+        message: "Please enter a valid email address.",
+      });
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setStatus({ type: "idle", message: "" });
+
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      let data: { error?: string; success?: boolean } = {};
+      try {
+        data = await res.json();
+      } catch {
+        data = {};
+      }
+
+      if (!res.ok) {
+        throw new Error(data?.error || "Failed to send message.");
+      }
+
+      setStatus({
+        type: "success",
+        message: "Your message has been sent successfully.",
+      });
+
+      setForm({
+        name: "",
+        email: "",
+        message: "",
+      });
+    } catch (error) {
+      setStatus({
+        type: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Something went wrong. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -28,8 +118,7 @@ export default function ContactUs() {
     >
       <div className="w-full px-4 sm:px-6">
         <div className="mx-auto w-full max-w-[1240px]">
-          <div className="grid w-full lg:grid-cols-2 lg:h-[680px]">
-            {/* LEFT: image */}
+          <div className="grid w-full lg:h-[680px] lg:grid-cols-2">
             <div className="relative h-[420px] sm:h-[520px] lg:h-full">
               <img
                 src="/contact/contact-photo.png"
@@ -38,50 +127,41 @@ export default function ContactUs() {
                 draggable={false}
               />
 
-              <div className="pointer-events-none absolute inset-0 flex flex-col justify-end px-6 sm:px-10 pb-10 sm:pb-14">
-                <h3 className="text-white font-extrabold leading-[1.05] tracking-tight text-[30px] sm:text-[40px]">
+              <div className="pointer-events-none absolute inset-0 flex flex-col justify-end px-6 pb-10 sm:px-10 sm:pb-14">
+                <h3 className="text-[30px] font-extrabold leading-[1.05] tracking-tight text-white sm:text-[40px]">
                   NEED HELP GROWING
                   <br />
                   YOUR CONTENT?
                 </h3>
 
-                <p className="mt-5 max-w-[520px] text-white/90 text-[13px] sm:text-[14px] leading-[1.7]">
+                <p className="mt-5 max-w-[520px] text-[13px] leading-[1.7] text-white/90 sm:text-[14px]">
                   Have a question or need support? Get in touch and let us handle
                   your content, design, and growth.
                 </p>
               </div>
             </div>
 
-            {/* RIGHT: form */}
             <div className="relative h-full overflow-hidden">
-              {/* ✅ content: نازل لتحت + يمين سنة */}
               <div className="relative z-10 h-full">
                 <div
-                  className="
-                    w-full
-                    px-6 sm:px-10 lg:px-12
-                    py-10 sm:py-12
-                    lg:py-0
-                  "
+                  className="w-full px-6 py-10 sm:px-10 sm:py-12 lg:px-12 lg:py-0"
                   style={{
                     height: "100%",
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "flex-start",
-                    // نزّل الكونتنت لتحت سنة زي الريفرنس
                     paddingTop: "clamp(48px, 7.5vh, 86px)",
-                    // نزقه يمين سنة (في اللابتوب)
                     paddingLeft: "clamp(24px, 2.2vw, 44px)",
                   }}
                 >
                   <h3
-                    className="font-extrabold tracking-tight text-[34px] sm:text-[44px]"
+                    className="text-[34px] font-extrabold tracking-tight sm:text-[44px]"
                     style={{ color: NAVY }}
                   >
                     CONTACT US
                   </h3>
 
-                  <form onSubmit={onSubmit} className="mt-7 space-y-6 max-w-[560px]">
+                  <form onSubmit={onSubmit} className="mt-7 max-w-[560px] space-y-6">
                     <Field
                       label="Name*"
                       placeholder="John Doe"
@@ -102,40 +182,53 @@ export default function ContactUs() {
                       textarea
                     />
 
-                    {/* Buttons row */}
-                    <div className="pt-2 flex items-stretch gap-3">
+                    {status.type !== "idle" && (
+                      <div
+                        className={[
+                          "rounded-[10px] border px-4 py-3 text-[13px] font-medium",
+                          status.type === "success"
+                            ? "border-green-700/20 bg-green-700/10 text-green-900"
+                            : "border-red-700/20 bg-red-700/10 text-red-900",
+                        ].join(" ")}
+                      >
+                        {status.message}
+                      </div>
+                    )}
+
+                    <div className="flex items-stretch gap-3 pt-2">
                       <motion.button
                         type="submit"
-                        whileHover={{ y: -2, scale: 1.01 }}
-                        whileTap={{ scale: 0.98 }}
+                        disabled={isSubmitting}
+                        whileHover={{ y: isSubmitting ? 0 : -2, scale: isSubmitting ? 1 : 1.01 }}
+                        whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
                         transition={{ type: "spring", stiffness: 240, damping: 18 }}
-                        className="h-[52px] flex-1 rounded-[10px] font-semibold text-white cursor-pointer"
+                        className="h-[52px] flex-1 cursor-pointer rounded-[10px] font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
                         style={{
                           backgroundColor: RED,
                           boxShadow: "0 18px 50px rgba(255,30,30,0.26)",
                         }}
                       >
-                        Send Message
+                        {isSubmitting ? "Sending..." : "Send Message"}
                       </motion.button>
 
                       <motion.button
                         type="submit"
                         aria-label="Send"
-                        whileHover={{ y: -2, scale: 1.03 }}
-                        whileTap={{ scale: 0.98 }}
+                        disabled={isSubmitting}
+                        whileHover={{ y: isSubmitting ? 0 : -2, scale: isSubmitting ? 1 : 1.03 }}
+                        whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
                         transition={{ type: "spring", stiffness: 240, damping: 18 }}
-                        className="h-[52px] w-[58px] rounded-[10px] grid place-items-center cursor-pointer"
+                        className="grid h-[52px] w-[58px] cursor-pointer place-items-center rounded-[10px] disabled:cursor-not-allowed disabled:opacity-70"
                         style={{
                           backgroundColor: RED,
                           boxShadow: "0 18px 50px rgba(255,30,30,0.26)",
                         }}
                       >
-                        <FiArrowRight className="text-white text-[20px]" />
+                        <FiArrowRight className="text-[20px] text-white" />
                       </motion.button>
                     </div>
                   </form>
 
-                  {/* ✅ مساحة صغيرة تحت الزرار عشان waves تبان “حتة” زي الريفرنس */}
                   <div className="h-[42px]" />
                 </div>
               </div>
@@ -162,7 +255,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="block text-[12px] font-semibold text-[#151A43] mb-2">
+      <label className="mb-2 block text-[12px] font-semibold text-[#151A43]">
         {label}
       </label>
 
@@ -176,6 +269,7 @@ function Field({
         />
       ) : (
         <input
+          type={label.toLowerCase().includes("email") ? "email" : "text"}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
