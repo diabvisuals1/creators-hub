@@ -38,7 +38,6 @@ export default function ContactUs() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-
     if (isSubmitting) return;
 
     const payload = {
@@ -84,7 +83,7 @@ export default function ContactUs() {
       }
 
       if (!res.ok) {
-        throw new Error(data?.error || "Failed to send message.");
+        throw new Error(data?.error || `Request failed with status ${res.status}`);
       }
 
       setStatus({
@@ -185,7 +184,7 @@ export default function ContactUs() {
                     {status.type !== "idle" && (
                       <div
                         className={[
-                          "rounded-[10px] border px-4 py-3 text-[13px] font-medium",
+                          "rounded-[10px] border px-4 py-3 text-[13px] font-medium break-words",
                           status.type === "success"
                             ? "border-green-700/20 bg-green-700/10 text-green-900"
                             : "border-red-700/20 bg-red-700/10 text-red-900",
