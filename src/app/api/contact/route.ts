@@ -39,15 +39,15 @@ export async function POST(request: Request) {
       );
     }
 
-    const apiKey = "re_ZbCYR9eb_8isJXmuBufeFbrAZ8Ck2gGqZ";
-    const toEmail = "omar.diab.work@gmail.com";
-    const fromEmail = "onboarding@resend.dev";
+    const apiKey = process.env.RESEND_API_KEY;
+    const toEmail = process.env.CONTACT_TO_EMAIL;
+    const fromEmail = process.env.CONTACT_FROM_EMAIL;
 
     if (!apiKey || !toEmail || !fromEmail) {
       return NextResponse.json(
         {
           error:
-            "Missing environment variables. Check RESEND_API_KEY, CONTACT_TO_EMAIL, CONTACT_FROM_EMAIL.",
+            "Missing environment variables: RESEND_API_KEY, CONTACT_TO_EMAIL, CONTACT_FROM_EMAIL",
         },
         { status: 500 }
       );
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
     const safeEmail = escapeHtml(email);
     const safeMessage = escapeHtml(message).replaceAll("\n", "<br />");
 
-    const { error } = await resend.emails.send({
+    const result = await resend.emails.send({
       from: `Creators Hub <${fromEmail}>`,
       to: [toEmail],
       replyTo: email,
@@ -86,20 +86,25 @@ export async function POST(request: Request) {
       `,
     });
 
-    if (error) {
-      console.error("Resend send error:", error);
+    if (result.error) {
+      console.error("Resend send error:", result.error);
       return NextResponse.json(
-        { error: error.message || "Failed to send email." },
+        { error: result.error.message || "Failed to send email." },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, id: result.data?.id ?? null });
   } catch (error) {
     console.error("Contact API error:", error);
 
     return NextResponse.json(
-      { error: "Failed to send message. Please try again later." },
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to send message. Please try again later.",
+      },
       { status: 500 }
     );
   }
