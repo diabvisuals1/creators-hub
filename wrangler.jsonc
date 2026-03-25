@@ -1,7 +1,4 @@
 {
   "name": "creators-hub",
-  "compatibility_date": "2026-02-03",
-  "assets": {
-    "directory": "./out"
-  }
+  "compatibility_date": "2026-02-03"
 }
