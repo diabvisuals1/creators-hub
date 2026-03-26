@@ -86,11 +86,8 @@ const labelVariants = {
 
 const R = 5.33;
 const LABEL_MARGIN = 16;
+const THUMBS_PER_PAGE = 5;
 
-/** =========================
- *  CUSTOM VIDEO ICONS
- *  غير المسارات دي بالأيقونات اللي هتحطها أنت
- *  ========================= */
 const VIDEO_ICONS = {
   play: "/video-icons/play.svg",
   pause: "/video-icons/pause.svg",
@@ -215,6 +212,10 @@ export default function SelectedProjects() {
         label: "PROJECT TWO / PROMO",
         video: "/projects/p2.mp4",
         subtitle: "[SELECTED PROJECTS]",
+        paragraphs: [
+          "This project centered on building a sharper promotional narrative with fast visual hooks and a more direct conversion-focused edit structure.",
+          "We combined polished pacing, thumbnail strategy, and platform-native motion cues to keep the campaign punchy and memorable.",
+        ],
         poster: "/projects/thumbs/t2.jpg",
         thumbs: [
           "/projects/thumbs/t2.jpg",
@@ -230,6 +231,10 @@ export default function SelectedProjects() {
         label: "PROJECT THREE / CAMPAIGN",
         video: "/projects/p3.mp4",
         subtitle: "[SELECTED PROJECTS]",
+        paragraphs: [
+          "For this campaign, we refined the storytelling around a single hero concept and designed the visuals to feel more cinematic while staying performance-first.",
+          "The final delivery balanced brand identity, speed, and clarity to support both reach and retention across social placements.",
+        ],
         poster: "/projects/thumbs/t3.jpg",
         thumbs: [
           "/projects/thumbs/t3.jpg",
@@ -245,6 +250,10 @@ export default function SelectedProjects() {
         label: "PROJECT FOUR / EDIT",
         video: "/projects/p4.mp4",
         subtitle: "[SELECTED PROJECTS]",
+        paragraphs: [
+          "This edit leaned into tension, rhythm, and visual contrast to create a stronger emotional pull from the opening seconds.",
+          "Our team focused on shot sequencing, motion emphasis, and sound-driven timing to give the piece a more premium finish.",
+        ],
         poster: "/projects/thumbs/t4.jpg",
         thumbs: [
           "/projects/thumbs/t4.jpg",
@@ -260,6 +269,10 @@ export default function SelectedProjects() {
         label: "PROJECT FIVE / SHORT",
         video: "/projects/p5.mp4",
         subtitle: "[SELECTED PROJECTS]",
+        paragraphs: [
+          "This short-form piece was developed to maximize attention in the first seconds while keeping the edit compact, energetic, and highly shareable.",
+          "We shaped the final cut around immediate visual payoff, stronger title readability, and a pacing system built for repeat views.",
+        ],
         poster: "/projects/thumbs/t5.jpg",
         thumbs: [
           "/projects/thumbs/t5.jpg",
@@ -278,11 +291,27 @@ export default function SelectedProjects() {
   const [direction, setDirection] = useState<1 | -1>(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showVideoUi, setShowVideoUi] = useState(true);
+  const [thumbPage, setThumbPage] = useState(0);
+  const [isMobileView, setIsMobileView] = useState(false);
 
   const active = projects[index];
   const activePoster = active.poster;
-  const activeThumbs =
-    active.thumbs && active.thumbs.length > 0 ? active.thumbs : [active.poster];
+
+  const totalThumbPages = Math.max(1, Math.ceil(projects.length / THUMBS_PER_PAGE));
+  const currentThumbPage = clamp(thumbPage, 0, totalThumbPages - 1);
+  const visibleThumbs = projects.slice(
+    currentThumbPage * THUMBS_PER_PAGE,
+    currentThumbPage * THUMBS_PER_PAGE + THUMBS_PER_PAGE
+  );
+  const canGoThumbPrev = currentThumbPage > 0;
+  const canGoThumbNext = currentThumbPage < totalThumbPages - 1;
+
+  const goThumbPage = useCallback(
+    (dir: 1 | -1) => {
+      setThumbPage((p) => clamp(p + dir, 0, totalThumbPages - 1));
+    },
+    [totalThumbPages]
+  );
 
   const go = useCallback(
     (nextDir: 1 | -1) => {
@@ -305,6 +334,16 @@ export default function SelectedProjects() {
   );
 
   useEffect(() => {
+    const updateViewport = () => {
+      setIsMobileView(window.innerWidth < 640);
+    };
+
+    updateViewport();
+    window.addEventListener("resize", updateViewport);
+    return () => window.removeEventListener("resize", updateViewport);
+  }, []);
+
+  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setIsFullscreen(false);
       if (e.key === "ArrowRight") go(1);
@@ -314,6 +353,11 @@ export default function SelectedProjects() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [go]);
+
+  useEffect(() => {
+    const nextPage = Math.floor(index / THUMBS_PER_PAGE);
+    setThumbPage(nextPage);
+  }, [index]);
 
   const startXRef = useRef<number | null>(null);
   const lastXRef = useRef<number | null>(null);
@@ -409,7 +453,11 @@ export default function SelectedProjects() {
       return;
     }
 
-    setShowVideoUi(true);
+    if (isMobileView) {
+      setShowVideoUi(true);
+    } else {
+      setShowVideoUi(true);
+    }
 
     const v = videoRef.current;
     if (!v) return;
@@ -444,7 +492,10 @@ export default function SelectedProjects() {
       v.removeEventListener("ended", onEnded);
       stopRAF();
     };
-  }, [isFullscreen, active.id, muted]);
+  }, [isFullscreen, active.id, muted, isMobileView]);
+
+  const shouldShowDesktopUi = !isMobileView && showVideoUi;
+  const shouldShowMobileUi = isMobileView;
 
   return (
     <section
@@ -644,7 +695,7 @@ export default function SelectedProjects() {
                           className="absolute inset-0"
                           style={{
                             background: activePoster
-                              ? "linear-gradient(180deg, rgba(10,12,24,0.06) 0%, rgba(10,12,24,0.10) 32%, rgba(10,12,24,0.22) 58%, rgba(10,12,24,0.52) 100%)"
+                              ? "linear-gradient(180deg, rgba(6,12,18,0.10) 0%, rgba(6,12,18,0.18) 24%, rgba(6,12,18,0.36) 58%, rgba(6,12,18,0.72) 100%)"
                               : "transparent",
                           }}
                         />
@@ -736,192 +787,110 @@ export default function SelectedProjects() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onMouseEnter={() => setShowVideoUi(true)}
-            onMouseLeave={() => setShowVideoUi(false)}
-            onMouseMove={() => setShowVideoUi(true)}
+            onMouseEnter={() => {
+              if (!isMobileView) setShowVideoUi(true);
+            }}
+            onMouseLeave={() => {
+              if (!isMobileView) setShowVideoUi(false);
+            }}
+            onMouseMove={() => {
+              if (!isMobileView) setShowVideoUi(true);
+            }}
           >
-            <video
-              ref={videoRef}
-              src={active.video}
-              poster={activePoster}
-              className="absolute inset-0 h-full w-full object-cover"
-              playsInline
-              muted={muted}
-              controls={false}
-              preload="metadata"
-            />
+            {isMobileView ? (
+              <>
+                <div className="absolute inset-0 bg-[#06111B]" />
 
-            <AnimatePresence>
-              {showVideoUi && (
-                <>
-                  <motion.div
-                    aria-hidden="true"
-                    className="absolute inset-0"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
+                <div className="absolute left-4 right-4 top-4 z-[240] pr-14 text-white">
+                  <div className="text-[10px] font-semibold tracking-[0.16em] opacity-85">
+                    {active.subtitle ?? "[SELECTED PROJECTS]"}
+                  </div>
+
+                  <div className="mt-4 font-extrabold leading-[0.9] tracking-tight">
+                    <div className="text-[34px]">
+                      {active.label.split("/")[0]?.trim()}
+                    </div>
+                    <div className="text-[34px]">
+                      / {active.label.split("/")[1]?.trim()}
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  aria-label="Close"
+                  onClick={() => setIsFullscreen(false)}
+                  className="absolute right-4 top-4 z-[250] grid h-[42px] w-[42px] cursor-pointer place-items-center rounded-full bg-black/26 backdrop-blur-sm"
+                >
+                  <IconImg src={VIDEO_ICONS.close} alt="Close" size={14} />
+                </button>
+
+                <div className="absolute left-0 right-0 top-[132px] z-[220] px-3">
+                  <div className="relative mx-auto aspect-[16/9] w-full overflow-hidden rounded-[18px] border border-white/10 bg-black shadow-[0_20px_40px_rgba(0,0,0,0.34)]">
+                    <video
+                      ref={videoRef}
+                      src={active.video}
+                      poster={activePoster}
+                      className="absolute inset-0 h-full w-full object-cover"
+                      playsInline
+                      muted={muted}
+                      controls={false}
+                      preload="metadata"
+                    />
+
+                    <div
+                      aria-hidden="true"
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background:
+                          "linear-gradient(180deg, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.12) 45%, rgba(0,0,0,0.20) 100%)",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className="absolute bottom-0 left-0 right-0 z-[240]">
+                  <div
+                    className="rounded-t-[24px] border-t border-white/10 bg-[#08111B] px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-4"
                     style={{
-                      background:
-                        "radial-gradient(900px 600px at 18% 25%, rgba(255,255,255,0.06) 0%, rgba(0,0,0,0) 58%)," +
-                        "linear-gradient(90deg, rgba(20,20,28,0.42) 0%, rgba(20,20,28,0.12) 40%, rgba(20,20,28,0.04) 100%)",
+                      boxShadow: "0 -14px 32px rgba(0,0,0,0.32)",
                     }}
-                  />
-
-                  <motion.button
-                    type="button"
-                    aria-label="Close"
-                    onClick={() => setIsFullscreen(false)}
-                    initial={{ opacity: 0, scale: 0.92 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.92 }}
-                    transition={{ duration: 0.18 }}
-                    className="absolute right-7 top-7 z-[240] grid h-[40px] w-[40px] cursor-pointer place-items-center rounded-full bg-black/22 backdrop-blur-sm"
-                    style={{ cursor: "pointer" }}
                   >
-                    <IconImg src={VIDEO_ICONS.close} alt="Close" size={13} />
-                  </motion.button>
-
-                  <motion.div
-                    className="absolute left-[34px] top-[28px] z-[220] max-w-[520px] text-white sm:left-[42px] sm:top-[34px] lg:left-[54px] lg:top-[38px]"
-                    initial={{ opacity: 0, x: -18 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -18 }}
-                    transition={{ duration: 0.22 }}
-                  >
-                    <div className="text-[11px] font-semibold tracking-[0.16em] opacity-80 sm:text-[12px]">
-                      {active.subtitle ?? "[SELECTED PROJECTS]"}
-                    </div>
-
-                    <div className="mt-5 font-extrabold leading-[0.92] tracking-tight">
-                      <div className="text-[52px] sm:text-[72px] lg:text-[84px]">
-                        {active.label.split("/")[0]?.trim()}
-                      </div>
-                      <div className="text-[52px] sm:text-[72px] lg:text-[84px]">
-                        / {active.label.split("/")[1]?.trim()}
-                      </div>
-                    </div>
-
-                    <div className="mt-10 max-w-[420px] space-y-8 text-[17px] leading-[1.42] opacity-95 sm:text-[20px] lg:text-[22px]">
-                      {(active.paragraphs ?? []).map((p, i) => (
-                        <p key={i}>{p}</p>
-                      ))}
-                    </div>
-                  </motion.div>
-
-                  {/* THUMBNAILS ROW */}
-                  <motion.div
-                    className="absolute bottom-[128px] left-1/2 z-[235] flex w-[min(68vw,980px)] -translate-x-1/2 items-center justify-center gap-4"
-                    initial={{ opacity: 0, y: 18 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 18 }}
-                    transition={{ duration: 0.22 }}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => go(-1)}
-                      className="grid h-[54px] w-[54px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/12 backdrop-blur-sm transition hover:bg-white/18"
-                      aria-label="Previous video"
-                    >
-                      <IconImg src={VIDEO_ICONS.prev} alt="Previous" size={22} />
-                    </button>
-
-                    <div className="flex min-w-0 flex-1 items-center justify-center gap-3 overflow-hidden">
-                      {projects.map((project, i) => {
-                        const thumbSrc =
-                          project.thumbs?.[0] || project.poster || activePoster;
-                        const activeThumb = i === index;
-
-                        return (
-                          <button
-                            key={project.id}
-                            type="button"
-                            onClick={() => goToIndex(i)}
-                            aria-label={`Open ${project.label}`}
-                            className="relative h-[110px] w-[180px] shrink-0 overflow-hidden rounded-[4px] transition-all duration-300"
-                            style={{
-                              opacity: activeThumb ? 1 : 0.9,
-                              transform: activeThumb ? "scale(1.04)" : "scale(1)",
-                              boxShadow: activeThumb
-                                ? "0 12px 36px rgba(0,0,0,0.34)"
-                                : "0 8px 24px rgba(0,0,0,0.20)",
-                              border: activeThumb
-                                ? "2px solid rgba(255,255,255,0.92)"
-                                : "1px solid rgba(255,255,255,0.12)",
-                            }}
-                          >
-                            <ThumbImage
-                              src={thumbSrc}
-                              alt={project.label}
-                              className="absolute inset-0 h-full w-full object-cover"
-                            />
-                            <div
-                              className="absolute inset-0"
-                              style={{
-                                background:
-                                  activeThumb
-                                    ? "linear-gradient(180deg, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.16) 100%)"
-                                    : "linear-gradient(180deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.28) 100%)",
-                              }}
-                            />
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => go(1)}
-                      className="grid h-[54px] w-[54px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/12 backdrop-blur-sm transition hover:bg-white/18"
-                      aria-label="Next video"
-                    >
-                      <IconImg src={VIDEO_ICONS.next} alt="Next" size={22} />
-                    </button>
-                  </motion.div>
-
-                  {/* BOTTOM CONTROLS */}
-                  <motion.div
-                    className="absolute bottom-[34px] left-[34px] right-[34px] z-[240] sm:left-[42px] sm:right-[42px] lg:left-[54px] lg:right-[54px]"
-                    initial={{ opacity: 0, y: 18 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 18 }}
-                    transition={{ duration: 0.22 }}
-                  >
-                    <div className="flex items-center gap-4 text-white">
+                    <div className="flex items-center gap-3 text-white">
                       <button
                         type="button"
                         onClick={togglePlay}
-                        className="grid h-[56px] w-[56px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/12 backdrop-blur-sm transition hover:bg-white/18"
+                        className="grid h-[46px] w-[46px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/12 transition"
                         aria-label={isPlaying ? "Pause" : "Play"}
                       >
                         <IconImg
                           src={isPlaying ? VIDEO_ICONS.pause : VIDEO_ICONS.play}
                           alt={isPlaying ? "Pause" : "Play"}
-                          size={22}
+                          size={18}
                         />
                       </button>
 
                       <button
                         type="button"
                         onClick={toggleMute}
-                        className="grid h-[56px] w-[56px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/12 backdrop-blur-sm transition hover:bg-white/18"
+                        className="grid h-[46px] w-[46px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/12 transition"
                         aria-label={muted ? "Unmute" : "Mute"}
                       >
                         <IconImg
                           src={muted ? VIDEO_ICONS.mute : VIDEO_ICONS.sound}
                           alt={muted ? "Muted" : "Sound"}
-                          size={22}
+                          size={18}
                         />
                       </button>
 
-                      <div className="w-[72px] shrink-0 text-[28px] font-medium tracking-tight text-white/96">
+                      <div className="w-[48px] shrink-0 text-[14px] font-semibold tracking-tight text-white/95">
                         {fmtTime(t)}
                       </div>
 
                       <div className="relative flex-1">
-                        <div className="relative h-[6px] rounded-full bg-white/20">
+                        <div className="relative h-[5px] rounded-full bg-white/20">
                           <div
-                            className="absolute left-0 top-0 h-[6px] rounded-full bg-white"
+                            className="absolute left-0 top-0 h-[5px] rounded-full bg-white"
                             style={{ width: `${dur > 0 ? (t / dur) * 100 : 0}%` }}
                           />
                           <input
@@ -935,22 +904,347 @@ export default function SelectedProjects() {
                             aria-label="Seek"
                           />
                           <div
-                            className="absolute top-1/2 h-[18px] w-[18px] -translate-y-1/2 rounded-full bg-white shadow-[0_0_0_6px_rgba(255,255,255,0.15)]"
+                            className="absolute top-1/2 h-[16px] w-[16px] -translate-y-1/2 rounded-full bg-white shadow-[0_0_0_5px_rgba(255,255,255,0.13)]"
                             style={{
-                              left: `calc(${dur > 0 ? (t / dur) * 100 : 0}% - 9px)`,
+                              left: `calc(${dur > 0 ? (t / dur) * 100 : 0}% - 8px)`,
                             }}
                           />
                         </div>
                       </div>
 
-                      <div className="w-[72px] shrink-0 text-right text-[28px] font-medium tracking-tight text-white/96">
+                      <div className="w-[48px] shrink-0 text-right text-[14px] font-semibold tracking-tight text-white/95">
                         {fmtTime(dur)}
                       </div>
                     </div>
-                  </motion.div>
-                </>
-              )}
-            </AnimatePresence>
+
+                    <div className="mt-4">
+                      <p
+                        className="text-[13px] leading-[1.45] text-white/88"
+                        style={{
+                          display: "-webkit-box",
+                          WebkitLineClamp: 4,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                          maskImage:
+                            "linear-gradient(180deg, rgba(0,0,0,1) 72%, rgba(0,0,0,0.45) 88%, rgba(0,0,0,0) 100%)",
+                        }}
+                      >
+                        {(active.paragraphs ?? []).join(" ")}
+                      </p>
+                    </div>
+
+                    <div className="mt-4 flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => go(-1)}
+                        className="grid h-[42px] w-[42px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/10"
+                        aria-label="Previous video"
+                      >
+                        <IconImg src={VIDEO_ICONS.prev} alt="Previous" size={16} />
+                      </button>
+
+                      <div
+                        className="flex min-w-0 flex-1 gap-3 overflow-x-auto overflow-y-hidden pb-1"
+                        style={{
+                          scrollSnapType: "x mandatory",
+                          WebkitOverflowScrolling: "touch",
+                          scrollbarWidth: "none",
+                          msOverflowStyle: "none",
+                        }}
+                      >
+                        {projects.map((project, i) => {
+                          const thumbSrc =
+                            project.thumbs?.[0] || project.poster || activePoster;
+                          const activeThumb = i === index;
+
+                          return (
+                            <button
+                              key={project.id}
+                              type="button"
+                              onClick={() => goToIndex(i)}
+                              aria-label={`Open ${project.label}`}
+                              className="relative shrink-0 overflow-hidden rounded-[8px] transition-all duration-300"
+                              style={{
+                                width: activeThumb ? 136 : 104,
+                                height: activeThumb ? 82 : 72,
+                                scrollSnapAlign: "center",
+                                opacity: activeThumb ? 1 : 0.86,
+                                transform: activeThumb ? "translateY(-2px)" : "translateY(0px)",
+                                border: activeThumb
+                                  ? "1px solid rgba(0,255,182,0.95)"
+                                  : "1px solid rgba(255,255,255,0.10)",
+                                boxShadow: activeThumb
+                                  ? "0 0 0 2px rgba(0,255,182,0.90), 0 0 0 5px rgba(0,255,182,0.14), 0 12px 28px rgba(0,255,182,0.18)"
+                                  : "0 8px 18px rgba(0,0,0,0.22)",
+                              }}
+                            >
+                              <ThumbImage
+                                src={thumbSrc}
+                                alt={project.label}
+                                className="absolute inset-0 h-full w-full object-cover"
+                              />
+
+                              <div
+                                className="absolute inset-0"
+                                style={{
+                                  background: activeThumb
+                                    ? "linear-gradient(180deg, rgba(0,255,182,0.04) 0%, rgba(0,255,182,0.14) 100%)"
+                                    : "linear-gradient(180deg, rgba(0,0,0,0.06) 0%, rgba(0,0,0,0.30) 100%)",
+                                }}
+                              />
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => go(1)}
+                        className="grid h-[42px] w-[42px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/10"
+                        aria-label="Next video"
+                      >
+                        <IconImg src={VIDEO_ICONS.next} alt="Next" size={16} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <video
+                  ref={videoRef}
+                  src={active.video}
+                  poster={activePoster}
+                  className="absolute inset-0 h-full w-full object-cover"
+                  playsInline
+                  muted={muted}
+                  controls={false}
+                  preload="metadata"
+                />
+
+                <AnimatePresence>
+                  {shouldShowDesktopUi && (
+                    <>
+                      <motion.div
+                        aria-hidden="true"
+                        className="absolute inset-0"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        style={{
+                          background:
+                            "radial-gradient(1000px 720px at 16% 26%, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 18%, rgba(0,0,0,0) 56%)," +
+                            "linear-gradient(90deg, rgba(5,10,16,0.72) 0%, rgba(5,10,16,0.48) 26%, rgba(5,10,16,0.24) 48%, rgba(5,10,16,0.10) 66%, rgba(5,10,16,0.03) 100%)," +
+                            "linear-gradient(180deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.12) 36%, rgba(0,0,0,0.22) 72%, rgba(0,0,0,0.34) 100%)",
+                        }}
+                      />
+
+                      <motion.button
+                        type="button"
+                        aria-label="Close"
+                        onClick={() => setIsFullscreen(false)}
+                        initial={{ opacity: 0, scale: 0.92 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.92 }}
+                        transition={{ duration: 0.18 }}
+                        className="absolute right-7 top-7 z-[240] grid h-[40px] w-[40px] cursor-pointer place-items-center rounded-full bg-black/22 backdrop-blur-sm"
+                      >
+                        <IconImg src={VIDEO_ICONS.close} alt="Close" size={13} />
+                      </motion.button>
+
+                      <motion.div
+                        className="absolute left-[34px] top-[28px] z-[220] max-w-[560px] text-white sm:left-[42px] sm:top-[34px] lg:left-[54px] lg:top-[38px]"
+                        initial={{ opacity: 0, x: -18 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -18 }}
+                        transition={{ duration: 0.22 }}
+                      >
+                        <div className="text-[11px] font-semibold tracking-[0.16em] opacity-85 sm:text-[12px]">
+                          {active.subtitle ?? "[SELECTED PROJECTS]"}
+                        </div>
+
+                        <div className="mt-5 font-extrabold leading-[0.92] tracking-tight">
+                          <div className="text-[52px] sm:text-[72px] lg:text-[84px]">
+                            {active.label.split("/")[0]?.trim()}
+                          </div>
+                          <div className="text-[52px] sm:text-[72px] lg:text-[84px]">
+                            / {active.label.split("/")[1]?.trim()}
+                          </div>
+                        </div>
+
+                        <div className="mt-10 max-w-[500px] space-y-7 text-[17px] leading-[1.42] opacity-100 sm:text-[20px] lg:text-[22px]">
+                          {(active.paragraphs ?? []).map((p, i) => (
+                            <p key={i}>{p}</p>
+                          ))}
+                        </div>
+                      </motion.div>
+
+                      <motion.div
+                        className="absolute bottom-[128px] left-1/2 z-[235] flex w-[min(76vw,1180px)] -translate-x-1/2 items-center justify-center gap-4"
+                        initial={{ opacity: 0, y: 18 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 18 }}
+                        transition={{ duration: 0.22 }}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => goThumbPage(-1)}
+                          disabled={!canGoThumbPrev}
+                          className={[
+                            "grid h-[54px] w-[54px] shrink-0 place-items-center rounded-full backdrop-blur-sm transition",
+                            canGoThumbPrev
+                              ? "cursor-pointer bg-white/12 hover:bg-white/18"
+                              : "cursor-not-allowed bg-white/6 opacity-35",
+                          ].join(" ")}
+                          aria-label="Previous thumbnails"
+                        >
+                          <IconImg src={VIDEO_ICONS.prev} alt="Previous" size={22} />
+                        </button>
+
+                        <div className="flex min-w-0 flex-1 items-center justify-center gap-4 overflow-hidden">
+                          {visibleThumbs.map((project) => {
+                            const projectIndex = projects.findIndex((p) => p.id === project.id);
+                            const thumbSrc =
+                              project.thumbs?.[0] || project.poster || activePoster;
+                            const activeThumb = projectIndex === index;
+
+                            return (
+                              <button
+                                key={project.id}
+                                type="button"
+                                onClick={() => goToIndex(projectIndex)}
+                                aria-label={`Open ${project.label}`}
+                                className="relative h-[118px] w-[192px] shrink-0 overflow-hidden rounded-[6px] transition-all duration-300"
+                                style={{
+                                  opacity: activeThumb ? 1 : 0.92,
+                                  transform: activeThumb ? "scale(1.035)" : "scale(1)",
+                                  boxShadow: activeThumb
+                                    ? "0 0 0 2px rgba(0,255,182,0.92), 0 0 0 6px rgba(0,255,182,0.18), 0 16px 42px rgba(0,255,182,0.20), 0 18px 36px rgba(0,0,0,0.30)"
+                                    : "0 8px 24px rgba(0,0,0,0.20)",
+                                  border: activeThumb
+                                    ? "1px solid rgba(0,255,182,0.95)"
+                                    : "1px solid rgba(255,255,255,0.12)",
+                                }}
+                              >
+                                <ThumbImage
+                                  src={thumbSrc}
+                                  alt={project.label}
+                                  className="absolute inset-0 h-full w-full object-cover"
+                                />
+
+                                <div
+                                  className="absolute inset-0"
+                                  style={{
+                                    background: activeThumb
+                                      ? "linear-gradient(180deg, rgba(0,255,182,0.04) 0%, rgba(0,255,182,0.12) 100%)"
+                                      : "linear-gradient(180deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.28) 100%)",
+                                  }}
+                                />
+
+                                {activeThumb && (
+                                  <div
+                                    aria-hidden="true"
+                                    className="absolute inset-0"
+                                    style={{
+                                      boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.22)",
+                                    }}
+                                  />
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => goThumbPage(1)}
+                          disabled={!canGoThumbNext}
+                          className={[
+                            "grid h-[54px] w-[54px] shrink-0 place-items-center rounded-full backdrop-blur-sm transition",
+                            canGoThumbNext
+                              ? "cursor-pointer bg-white/12 hover:bg-white/18"
+                              : "cursor-not-allowed bg-white/6 opacity-35",
+                          ].join(" ")}
+                          aria-label="Next thumbnails"
+                        >
+                          <IconImg src={VIDEO_ICONS.next} alt="Next" size={22} />
+                        </button>
+                      </motion.div>
+
+                      <motion.div
+                        className="absolute bottom-[34px] left-[34px] right-[34px] z-[240] sm:left-[42px] sm:right-[42px] lg:left-[54px] lg:right-[54px]"
+                        initial={{ opacity: 0, y: 18 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 18 }}
+                        transition={{ duration: 0.22 }}
+                      >
+                        <div className="flex items-center gap-4 text-white">
+                          <button
+                            type="button"
+                            onClick={togglePlay}
+                            className="grid h-[56px] w-[56px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/12 backdrop-blur-sm transition hover:bg-white/18"
+                            aria-label={isPlaying ? "Pause" : "Play"}
+                          >
+                            <IconImg
+                              src={isPlaying ? VIDEO_ICONS.pause : VIDEO_ICONS.play}
+                              alt={isPlaying ? "Pause" : "Play"}
+                              size={22}
+                            />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={toggleMute}
+                            className="grid h-[56px] w-[56px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/12 backdrop-blur-sm transition hover:bg-white/18"
+                            aria-label={muted ? "Unmute" : "Mute"}
+                          >
+                            <IconImg
+                              src={muted ? VIDEO_ICONS.mute : VIDEO_ICONS.sound}
+                              alt={muted ? "Muted" : "Sound"}
+                              size={22}
+                            />
+                          </button>
+
+                          <div className="w-[72px] shrink-0 text-[28px] font-medium tracking-tight text-white/96">
+                            {fmtTime(t)}
+                          </div>
+
+                          <div className="relative flex-1">
+                            <div className="relative h-[6px] rounded-full bg-white/20">
+                              <div
+                                className="absolute left-0 top-0 h-[6px] rounded-full bg-white"
+                                style={{ width: `${dur > 0 ? (t / dur) * 100 : 0}%` }}
+                              />
+                              <input
+                                type="range"
+                                min={0}
+                                max={dur || 0}
+                                step={0.1}
+                                value={t}
+                                onChange={(e) => seekTo(Number(e.target.value))}
+                                className="absolute inset-0 w-full cursor-pointer opacity-0"
+                                aria-label="Seek"
+                              />
+                              <div
+                                className="absolute top-1/2 h-[18px] w-[18px] -translate-y-1/2 rounded-full bg-white shadow-[0_0_0_6px_rgba(255,255,255,0.15)]"
+                                style={{
+                                  left: `calc(${dur > 0 ? (t / dur) * 100 : 0}% - 9px)`,
+                                }}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="w-[72px] shrink-0 text-right text-[28px] font-medium tracking-tight text-white/96">
+                            {fmtTime(dur)}
+                          </div>
+                        </div>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

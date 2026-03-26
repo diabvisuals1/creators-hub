@@ -161,7 +161,7 @@ export default function AboutUs() {
 
                 {/* Globe */}
                 <img
-                  src="/about/globe.svg"
+                  src="/about/globe.png"
                   alt="Globe"
                   draggable={false}
                   className="
@@ -169,9 +169,9 @@ export default function AboutUs() {
                     w-[500px] max-w-none -translate-x-1/2 select-none
                     transition-transform duration-500 ease-out
                     sm:w-[620px]
-                    md:w-[700px]
-                    lg:bottom-[-2px] lg:w-[780px]
-                    xl:w-[820px]
+                    md:w-[716px]
+                    lg:bottom-[-2px] lg:w-[643px]
+                    xl:w-[643px]
                   "
                 />
 
