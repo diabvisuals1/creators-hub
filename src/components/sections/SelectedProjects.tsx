@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { FiChevronLeft, FiChevronRight, FiX } from "react-icons/fi";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 type Project = {
   id: string;
@@ -20,8 +20,86 @@ const popIn = (delay = 0) => ({
   transition: { delay, type: "spring" as const, stiffness: 180, damping: 18 },
 });
 
+const cardSwapVariants = {
+  enter: (dir: 1 | -1) => ({
+    x: dir > 0 ? 110 : -110,
+    y: 8,
+    rotate: dir > 0 ? 7 : -7,
+    scale: 0.94,
+    opacity: 0,
+    filter: "blur(6px)",
+  }),
+  center: {
+    x: 0,
+    y: 0,
+    rotate: 0,
+    scale: 1,
+    opacity: 1,
+    filter: "blur(0px)",
+    transition: {
+      x: { type: "spring" as const, stiffness: 180, damping: 24 },
+      y: { type: "spring" as const, stiffness: 180, damping: 24 },
+      rotate: { type: "spring" as const, stiffness: 160, damping: 20 },
+      scale: { duration: 0.32, ease: [0.22, 1, 0.36, 1] as const },
+      opacity: { duration: 0.22 },
+      filter: { duration: 0.22 },
+    },
+  },
+  exit: (dir: 1 | -1) => ({
+    x: dir > 0 ? -150 : 150,
+    y: -6,
+    rotate: dir > 0 ? -9 : 9,
+    scale: 0.9,
+    opacity: 0,
+    filter: "blur(8px)",
+    transition: {
+      duration: 0.28,
+      ease: [0.4, 0, 0.2, 1] as const,
+    },
+  }),
+};
+
+const labelVariants = {
+  enter: (dir: 1 | -1) => ({
+    x: dir > 0 ? 34 : -34,
+    opacity: 0,
+    rotate: dir > 0 ? 2 : -2,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+    rotate: 0,
+    transition: {
+      type: "spring" as const,
+      stiffness: 220,
+      damping: 22,
+      mass: 0.8,
+    },
+  },
+  exit: (dir: 1 | -1) => ({
+    x: dir > 0 ? -34 : 34,
+    opacity: 0,
+    rotate: dir > 0 ? -2 : 2,
+    transition: { duration: 0.2 },
+  }),
+};
+
 const R = 5.33;
 const LABEL_MARGIN = 16;
+
+/** =========================
+ *  CUSTOM VIDEO ICONS
+ *  غير المسارات دي بالأيقونات اللي هتحطها أنت
+ *  ========================= */
+const VIDEO_ICONS = {
+  play: "/video-icons/play.svg",
+  pause: "/video-icons/pause.svg",
+  sound: "/video-icons/sound.svg",
+  mute: "/video-icons/mute.svg",
+  close: "/video-icons/close.svg",
+  prev: "/video-icons/prev.svg",
+  next: "/video-icons/next.svg",
+};
 
 function clamp(n: number, a: number, b: number) {
   return Math.max(a, Math.min(b, n));
@@ -54,10 +132,20 @@ function ThumbImage({
       <div
         className={className}
         style={{
-          background:
-            "linear-gradient(180deg, rgba(250,230,175,0.95) 0%, rgba(220,185,120,0.95) 100%)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "transparent",
+          color: "rgba(255,255,255,0.92)",
+          fontSize: "clamp(16px,2vw,28px)",
+          fontWeight: 700,
+          letterSpacing: "0.08em",
+          textAlign: "center",
+          padding: "24px",
         }}
-      />
+      >
+        {alt || "IMAGE NOT AVAILABLE"}
+      </div>
     );
   }
 
@@ -68,6 +156,34 @@ function ThumbImage({
       draggable={false}
       onError={() => setFailed(true)}
       className={className}
+    />
+  );
+}
+
+function IconImg({
+  src,
+  alt,
+  size = 20,
+  className = "",
+}: {
+  src: string;
+  alt: string;
+  size?: number;
+  className?: string;
+}) {
+  return (
+    <img
+      src={src}
+      alt={alt}
+      draggable={false}
+      className={className}
+      style={{
+        width: size,
+        height: size,
+        objectFit: "contain",
+        pointerEvents: "none",
+        userSelect: "none",
+      }}
     />
   );
 }
@@ -159,23 +275,33 @@ export default function SelectedProjects() {
   );
 
   const [index, setIndex] = useState(0);
+  const [direction, setDirection] = useState<1 | -1>(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showVideoUi, setShowVideoUi] = useState(true);
 
   const active = projects[index];
   const activePoster = active.poster;
   const activeThumbs =
-    active.thumbs && active.thumbs.length > 0
-      ? active.thumbs
-      : [active.poster];
+    active.thumbs && active.thumbs.length > 0 ? active.thumbs : [active.poster];
 
   const go = useCallback(
     (nextDir: 1 | -1) => {
+      setDirection(nextDir);
       setIndex((i) => {
         const n = projects.length;
         return (i + nextDir + n) % n;
       });
     },
     [projects.length]
+  );
+
+  const goToIndex = useCallback(
+    (nextIndex: number) => {
+      if (nextIndex === index) return;
+      setDirection(nextIndex > index ? 1 : -1);
+      setIndex(nextIndex);
+    },
+    [index]
   );
 
   useEffect(() => {
@@ -282,6 +408,8 @@ export default function SelectedProjects() {
       setDur(0);
       return;
     }
+
+    setShowVideoUi(true);
 
     const v = videoRef.current;
     if (!v) return;
@@ -423,21 +551,35 @@ export default function SelectedProjects() {
                     transformOrigin: "72% 50%",
                   }}
                 >
-                  <div
+                  <motion.div
                     aria-hidden="true"
                     className="absolute inset-0"
+                    animate={{
+                      x: direction > 0 ? 42 : 36,
+                      y: direction > 0 ? 34 : 30,
+                      rotate: direction > 0 ? -0.4 : 0.4,
+                    }}
+                    transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
                     style={{
-                      transform: "translate(42px, 34px)",
                       background: "#08A678",
                       borderRadius: R,
                       clipPath: "polygon(0 0, 92% 0, 100% 22%, 100% 100%, 0 100%)",
                     }}
                   />
-                  <div
+                  <motion.div
                     aria-hidden="true"
                     className="absolute inset-0"
+                    animate={{
+                      x: direction > 0 ? 26 : 22,
+                      y: direction > 0 ? 22 : 18,
+                      rotate: direction > 0 ? -0.25 : 0.25,
+                    }}
+                    transition={{
+                      duration: 0.24,
+                      delay: 0.03,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
                     style={{
-                      transform: "translate(26px, 22px)",
                       background: "#1FC393",
                       borderRadius: R,
                       clipPath: "polygon(0 0, 92% 0, 100% 22%, 100% 100%, 0 100%)",
@@ -471,49 +613,65 @@ export default function SelectedProjects() {
                         "0 34px 70px rgba(0,0,0,0.22), 0 18px 36px rgba(0,0,0,0.14)",
                       cursor: "grab",
                       touchAction: "pan-y",
-                      background:
-                        "linear-gradient(180deg, rgba(250,230,175,1) 0%, rgba(220,185,120,1) 100%)",
+                      background: "transparent",
                     }}
                     onPointerDown={onCardPointerDown}
                     onPointerMove={onCardPointerMove}
                     onPointerUp={onCardPointerUp}
                     onPointerCancel={onCardPointerUp}
                   >
-                    {/* single poster only for this card */}
-                    <ThumbImage
-                      src={activePoster}
-                      alt={active.label}
-                      className="absolute inset-0 h-full w-full object-cover select-none"
-                    />
+                    <AnimatePresence mode="wait" custom={direction} initial={false}>
+                      <motion.div
+                        key={active.id}
+                        custom={direction}
+                        variants={cardSwapVariants}
+                        initial="enter"
+                        animate="center"
+                        exit="exit"
+                        className="absolute inset-0"
+                        style={{
+                          transformOrigin: direction > 0 ? "85% 50%" : "15% 50%",
+                        }}
+                      >
+                        <ThumbImage
+                          src={activePoster}
+                          alt={active.label}
+                          className="absolute inset-0 h-full w-full object-cover select-none"
+                        />
 
-                    <div
-                      aria-hidden="true"
-                      className="absolute inset-0"
-                      style={{
-                        background:
-                          "linear-gradient(180deg, rgba(10,12,24,0.06) 0%, rgba(10,12,24,0.10) 32%, rgba(10,12,24,0.22) 58%, rgba(10,12,24,0.52) 100%)",
-                      }}
-                    />
+                        <div
+                          aria-hidden="true"
+                          className="absolute inset-0"
+                          style={{
+                            background: activePoster
+                              ? "linear-gradient(180deg, rgba(10,12,24,0.06) 0%, rgba(10,12,24,0.10) 32%, rgba(10,12,24,0.22) 58%, rgba(10,12,24,0.52) 100%)"
+                              : "transparent",
+                          }}
+                        />
 
-                    <button
-                      data-play-btn
-                      type="button"
-                      aria-label="Play video"
-                      onPointerDownCapture={(e) => e.stopPropagation()}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsFullscreen(true);
-                      }}
-                      className="absolute left-1/2 top-1/2 z-[60] -translate-x-1/2 -translate-y-1/2 cursor-pointer"
-                      style={{ width: 96, height: 96 }}
-                    >
-                      <img
-                        src="/playicon.svg"
-                        alt=""
-                        draggable={false}
-                        style={{ width: 96, height: 96, cursor: "pointer" }}
-                      />
-                    </button>
+                        <button
+                          data-play-btn
+                          type="button"
+                          aria-label="Play video"
+                          onPointerDownCapture={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsFullscreen(true);
+                          }}
+                          className="absolute left-1/2 top-1/2 z-[60] -translate-x-1/2 -translate-y-1/2 cursor-pointer"
+                          style={{ width: 96, height: 96 }}
+                        >
+                          <motion.img
+                            src="/playicon.svg"
+                            alt=""
+                            draggable={false}
+                            whileHover={{ scale: 1.08 }}
+                            whileTap={{ scale: 0.94 }}
+                            style={{ width: 96, height: 96, cursor: "pointer" }}
+                          />
+                        </button>
+                      </motion.div>
+                    </AnimatePresence>
 
                     <div
                       className="pointer-events-none absolute"
@@ -533,21 +691,34 @@ export default function SelectedProjects() {
                           borderRadius: R,
                         }}
                       />
+
                       <div
-                        className="absolute inset-0 flex items-center justify-center bg-[#F6F6F6]"
-                        style={{
-                          borderRadius: R,
-                          fontFamily: "var(--font-godber)",
-                          fontWeight: 400,
-                          fontSize: "clamp(18px,2.2vw,36px)",
-                          color: "#FF1E1E",
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          padding: "0 16px",
-                        }}
+                        className="absolute inset-0 overflow-hidden"
+                        style={{ borderRadius: R }}
                       >
-                        {active.label}
+                        <AnimatePresence mode="wait" custom={direction} initial={false}>
+                          <motion.div
+                            key={active.id + "-label"}
+                            custom={direction}
+                            variants={labelVariants}
+                            initial="enter"
+                            animate="center"
+                            exit="exit"
+                            className="absolute inset-0 flex items-center justify-center bg-[#F6F6F6]"
+                            style={{
+                              fontFamily: "var(--font-godber)",
+                              fontWeight: 400,
+                              fontSize: "clamp(18px,2.2vw,36px)",
+                              color: "#FF1E1E",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              padding: "0 16px",
+                            }}
+                          >
+                            {active.label}
+                          </motion.div>
+                        </AnimatePresence>
                       </div>
                     </div>
                   </div>
@@ -565,6 +736,9 @@ export default function SelectedProjects() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            onMouseEnter={() => setShowVideoUi(true)}
+            onMouseLeave={() => setShowVideoUi(false)}
+            onMouseMove={() => setShowVideoUi(true)}
           >
             <video
               ref={videoRef}
@@ -577,139 +751,206 @@ export default function SelectedProjects() {
               preload="metadata"
             />
 
-            <div
-              aria-hidden="true"
-              className="absolute inset-0"
-              style={{
-                background:
-                  "radial-gradient(900px 600px at 18% 25%, rgba(255,255,255,0.10) 0%, rgba(0,0,0,0) 58%)," +
-                  "linear-gradient(90deg, rgba(20,20,28,0.68) 0%, rgba(20,20,28,0.18) 55%, rgba(20,20,28,0.10) 100%)",
-              }}
-            />
+            <AnimatePresence>
+              {showVideoUi && (
+                <>
+                  <motion.div
+                    aria-hidden="true"
+                    className="absolute inset-0"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    style={{
+                      background:
+                        "radial-gradient(900px 600px at 18% 25%, rgba(255,255,255,0.06) 0%, rgba(0,0,0,0) 58%)," +
+                        "linear-gradient(90deg, rgba(20,20,28,0.42) 0%, rgba(20,20,28,0.12) 40%, rgba(20,20,28,0.04) 100%)",
+                    }}
+                  />
 
-            <button
-              type="button"
-              aria-label="Close"
-              onClick={() => setIsFullscreen(false)}
-              className="absolute right-6 top-6 z-[230] grid h-[38px] w-[38px] cursor-pointer place-items-center rounded-full bg-white/20 backdrop-blur"
-              style={{ cursor: "pointer" }}
-            >
-              <FiX className="text-[18px] text-white" />
-            </button>
+                  <motion.button
+                    type="button"
+                    aria-label="Close"
+                    onClick={() => setIsFullscreen(false)}
+                    initial={{ opacity: 0, scale: 0.92 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.92 }}
+                    transition={{ duration: 0.18 }}
+                    className="absolute right-7 top-7 z-[240] grid h-[40px] w-[40px] cursor-pointer place-items-center rounded-full bg-black/22 backdrop-blur-sm"
+                    style={{ cursor: "pointer" }}
+                  >
+                    <IconImg src={VIDEO_ICONS.close} alt="Close" size={13} />
+                  </motion.button>
 
-            <div className="absolute left-8 top-8 z-[220] max-w-[420px] text-white">
-              <div className="text-[10px] tracking-[0.18em] opacity-70">
-                {active.subtitle ?? "[SELECTED PROJECTS]"}
-              </div>
+                  <motion.div
+                    className="absolute left-[34px] top-[28px] z-[220] max-w-[520px] text-white sm:left-[42px] sm:top-[34px] lg:left-[54px] lg:top-[38px]"
+                    initial={{ opacity: 0, x: -18 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -18 }}
+                    transition={{ duration: 0.22 }}
+                  >
+                    <div className="text-[11px] font-semibold tracking-[0.16em] opacity-80 sm:text-[12px]">
+                      {active.subtitle ?? "[SELECTED PROJECTS]"}
+                    </div>
 
-              <div className="mt-3 font-extrabold leading-[0.95]">
-                <div className="text-[56px]">{active.label.split("/")[0]?.trim()}</div>
-                <div className="text-[56px]">/ {active.label.split("/")[1]?.trim()}</div>
-              </div>
-
-              <div className="mt-10 space-y-8 text-[14px] leading-[1.7] opacity-90">
-                {(active.paragraphs ?? []).map((p, i) => (
-                  <p key={i}>{p}</p>
-                ))}
-              </div>
-            </div>
-
-            <div className="absolute bottom-0 left-0 right-0 z-[230] px-8 pb-8">
-              <div className="mb-3 flex items-center gap-4">
-                <button
-                  type="button"
-                  onClick={() => go(-1)}
-                  className="grid h-[36px] w-[36px] cursor-pointer place-items-center rounded-full bg-white/15 text-white backdrop-blur"
-                  aria-label="Previous video"
-                  style={{ cursor: "pointer" }}
-                >
-                  <FiChevronLeft />
-                </button>
-
-                <div className="flex-1 overflow-hidden">
-                  <div className="flex items-center gap-3">
-                    {activeThumbs.slice(0, 7).map((src, i) => (
-                      <div
-                        key={src + i}
-                        className="h-[48px] w-[74px] overflow-hidden"
-                        style={{
-                          borderRadius: 6,
-                          boxShadow: "0 10px 26px rgba(0,0,0,0.35)",
-                          opacity: i === 0 ? 1 : 0.9,
-                        }}
-                      >
-                        <ThumbImage src={src} />
+                    <div className="mt-5 font-extrabold leading-[0.92] tracking-tight">
+                      <div className="text-[52px] sm:text-[72px] lg:text-[84px]">
+                        {active.label.split("/")[0]?.trim()}
                       </div>
-                    ))}
-                  </div>
-                </div>
+                      <div className="text-[52px] sm:text-[72px] lg:text-[84px]">
+                        / {active.label.split("/")[1]?.trim()}
+                      </div>
+                    </div>
 
-                <button
-                  type="button"
-                  onClick={() => go(1)}
-                  className="grid h-[36px] w-[36px] cursor-pointer place-items-center rounded-full bg-white/15 text-white backdrop-blur"
-                  aria-label="Next video"
-                  style={{ cursor: "pointer" }}
-                >
-                  <FiChevronRight />
-                </button>
-              </div>
+                    <div className="mt-10 max-w-[420px] space-y-8 text-[17px] leading-[1.42] opacity-95 sm:text-[20px] lg:text-[22px]">
+                      {(active.paragraphs ?? []).map((p, i) => (
+                        <p key={i}>{p}</p>
+                      ))}
+                    </div>
+                  </motion.div>
 
-              <div className="flex items-center gap-4 text-white/90">
-                <button
-                  type="button"
-                  onClick={togglePlay}
-                  className="grid h-[34px] w-[34px] cursor-pointer place-items-center rounded-full bg-white/15 backdrop-blur"
-                  aria-label={isPlaying ? "Pause" : "Play"}
-                  style={{ cursor: "pointer" }}
-                >
-                  {isPlaying ? (
-                    <span className="text-[14px] font-bold">||</span>
-                  ) : (
-                    <span className="text-[14px] font-bold">▶</span>
-                  )}
-                </button>
+                  {/* THUMBNAILS ROW */}
+                  <motion.div
+                    className="absolute bottom-[128px] left-1/2 z-[235] flex w-[min(68vw,980px)] -translate-x-1/2 items-center justify-center gap-4"
+                    initial={{ opacity: 0, y: 18 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 18 }}
+                    transition={{ duration: 0.22 }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => go(-1)}
+                      className="grid h-[54px] w-[54px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/12 backdrop-blur-sm transition hover:bg-white/18"
+                      aria-label="Previous video"
+                    >
+                      <IconImg src={VIDEO_ICONS.prev} alt="Previous" size={22} />
+                    </button>
 
-                <button
-                  type="button"
-                  onClick={toggleMute}
-                  className="h-[34px] cursor-pointer rounded-full bg-white/15 px-3 text-[12px] backdrop-blur"
-                  aria-label={muted ? "Unmute" : "Mute"}
-                  style={{ cursor: "pointer" }}
-                >
-                  {muted ? "MUTED" : "SOUND"}
-                </button>
+                    <div className="flex min-w-0 flex-1 items-center justify-center gap-3 overflow-hidden">
+                      {projects.map((project, i) => {
+                        const thumbSrc =
+                          project.thumbs?.[0] || project.poster || activePoster;
+                        const activeThumb = i === index;
 
-                <div className="w-[54px] text-[12px]">{fmtTime(t)}</div>
+                        return (
+                          <button
+                            key={project.id}
+                            type="button"
+                            onClick={() => goToIndex(i)}
+                            aria-label={`Open ${project.label}`}
+                            className="relative h-[110px] w-[180px] shrink-0 overflow-hidden rounded-[4px] transition-all duration-300"
+                            style={{
+                              opacity: activeThumb ? 1 : 0.9,
+                              transform: activeThumb ? "scale(1.04)" : "scale(1)",
+                              boxShadow: activeThumb
+                                ? "0 12px 36px rgba(0,0,0,0.34)"
+                                : "0 8px 24px rgba(0,0,0,0.20)",
+                              border: activeThumb
+                                ? "2px solid rgba(255,255,255,0.92)"
+                                : "1px solid rgba(255,255,255,0.12)",
+                            }}
+                          >
+                            <ThumbImage
+                              src={thumbSrc}
+                              alt={project.label}
+                              className="absolute inset-0 h-full w-full object-cover"
+                            />
+                            <div
+                              className="absolute inset-0"
+                              style={{
+                                background:
+                                  activeThumb
+                                    ? "linear-gradient(180deg, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.16) 100%)"
+                                    : "linear-gradient(180deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.28) 100%)",
+                              }}
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
 
-                <div className="flex-1">
-                  <div className="relative h-[6px] rounded-full bg-white/25">
-                    <div
-                      className="absolute left-0 top-0 h-[6px] rounded-full bg-white"
-                      style={{ width: `${dur > 0 ? (t / dur) * 100 : 0}%` }}
-                    />
-                    <input
-                      type="range"
-                      min={0}
-                      max={dur || 0}
-                      step={0.1}
-                      value={t}
-                      onChange={(e) => seekTo(Number(e.target.value))}
-                      className="absolute inset-0 w-full cursor-pointer opacity-0"
-                      aria-label="Seek"
-                    />
-                    <div
-                      className="absolute top-1/2 h-[14px] w-[14px] -translate-y-1/2 rounded-full bg-white"
-                      style={{
-                        left: `calc(${dur > 0 ? (t / dur) * 100 : 0}% - 7px)`,
-                      }}
-                    />
-                  </div>
-                </div>
+                    <button
+                      type="button"
+                      onClick={() => go(1)}
+                      className="grid h-[54px] w-[54px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/12 backdrop-blur-sm transition hover:bg-white/18"
+                      aria-label="Next video"
+                    >
+                      <IconImg src={VIDEO_ICONS.next} alt="Next" size={22} />
+                    </button>
+                  </motion.div>
 
-                <div className="w-[54px] text-right text-[12px]">{fmtTime(dur)}</div>
-              </div>
-            </div>
+                  {/* BOTTOM CONTROLS */}
+                  <motion.div
+                    className="absolute bottom-[34px] left-[34px] right-[34px] z-[240] sm:left-[42px] sm:right-[42px] lg:left-[54px] lg:right-[54px]"
+                    initial={{ opacity: 0, y: 18 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 18 }}
+                    transition={{ duration: 0.22 }}
+                  >
+                    <div className="flex items-center gap-4 text-white">
+                      <button
+                        type="button"
+                        onClick={togglePlay}
+                        className="grid h-[56px] w-[56px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/12 backdrop-blur-sm transition hover:bg-white/18"
+                        aria-label={isPlaying ? "Pause" : "Play"}
+                      >
+                        <IconImg
+                          src={isPlaying ? VIDEO_ICONS.pause : VIDEO_ICONS.play}
+                          alt={isPlaying ? "Pause" : "Play"}
+                          size={22}
+                        />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={toggleMute}
+                        className="grid h-[56px] w-[56px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/12 backdrop-blur-sm transition hover:bg-white/18"
+                        aria-label={muted ? "Unmute" : "Mute"}
+                      >
+                        <IconImg
+                          src={muted ? VIDEO_ICONS.mute : VIDEO_ICONS.sound}
+                          alt={muted ? "Muted" : "Sound"}
+                          size={22}
+                        />
+                      </button>
+
+                      <div className="w-[72px] shrink-0 text-[28px] font-medium tracking-tight text-white/96">
+                        {fmtTime(t)}
+                      </div>
+
+                      <div className="relative flex-1">
+                        <div className="relative h-[6px] rounded-full bg-white/20">
+                          <div
+                            className="absolute left-0 top-0 h-[6px] rounded-full bg-white"
+                            style={{ width: `${dur > 0 ? (t / dur) * 100 : 0}%` }}
+                          />
+                          <input
+                            type="range"
+                            min={0}
+                            max={dur || 0}
+                            step={0.1}
+                            value={t}
+                            onChange={(e) => seekTo(Number(e.target.value))}
+                            className="absolute inset-0 w-full cursor-pointer opacity-0"
+                            aria-label="Seek"
+                          />
+                          <div
+                            className="absolute top-1/2 h-[18px] w-[18px] -translate-y-1/2 rounded-full bg-white shadow-[0_0_0_6px_rgba(255,255,255,0.15)]"
+                            style={{
+                              left: `calc(${dur > 0 ? (t / dur) * 100 : 0}% - 9px)`,
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="w-[72px] shrink-0 text-right text-[28px] font-medium tracking-tight text-white/96">
+                        {fmtTime(dur)}
+                      </div>
+                    </div>
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
       </AnimatePresence>
