@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import emailjs from "@emailjs/browser";
 import { FiArrowRight } from "react-icons/fi";
 import { motion } from "framer-motion";
 
@@ -19,6 +20,36 @@ type StatusState = {
   message: string;
 };
 
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error && error.message.trim()) {
+    return error.message;
+  }
+
+  if (typeof error === "string" && error.trim()) {
+    return error;
+  }
+
+  if (typeof error === "object" && error !== null) {
+    const maybeText = "text" in error ? error.text : undefined;
+    const maybeMessage = "message" in error ? error.message : undefined;
+    const maybeStatusText = "statusText" in error ? error.statusText : undefined;
+
+    if (typeof maybeText === "string" && maybeText.trim()) {
+      return maybeText;
+    }
+
+    if (typeof maybeMessage === "string" && maybeMessage.trim()) {
+      return maybeMessage;
+    }
+
+    if (typeof maybeStatusText === "string" && maybeStatusText.trim()) {
+      return maybeStatusText;
+    }
+  }
+
+  return "Failed to send message. Please check your EmailJS settings.";
+}
+
 export default function ContactUs() {
   const [form, setForm] = useState<FormState>({
     name: "",
@@ -32,12 +63,22 @@ export default function ContactUs() {
     message: "",
   });
 
+  const emailJsConfig = useMemo(
+    () => ({
+      serviceId: process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID?.trim() || "",
+      templateId: process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID?.trim() || "",
+      publicKey: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY?.trim() || "",
+    }),
+    []
+  );
+
   function onChange<K extends keyof FormState>(key: K, val: string) {
-    setForm((p) => ({ ...p, [key]: val }));
+    setForm((prev) => ({ ...prev, [key]: val }));
   }
 
-  async function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
     if (isSubmitting) return;
 
     const payload = {
@@ -63,27 +104,36 @@ export default function ContactUs() {
       return;
     }
 
+    if (
+      !emailJsConfig.serviceId ||
+      !emailJsConfig.templateId ||
+      !emailJsConfig.publicKey
+    ) {
+      setStatus({
+        type: "error",
+        message:
+          "EmailJS is not configured yet. Add NEXT_PUBLIC_EMAILJS_SERVICE_ID, NEXT_PUBLIC_EMAILJS_TEMPLATE_ID, and NEXT_PUBLIC_EMAILJS_PUBLIC_KEY.",
+      });
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       setStatus({ type: "idle", message: "" });
 
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await emailjs.send(
+        emailJsConfig.serviceId,
+        emailJsConfig.templateId,
+        {
+          name: payload.name,
+          email: payload.email,
+          message: payload.message,
         },
-        body: JSON.stringify(payload),
-      });
+        emailJsConfig.publicKey
+      );
 
-      let data: { error?: string; success?: boolean } = {};
-      try {
-        data = await res.json();
-      } catch {
-        data = {};
-      }
-
-      if (!res.ok) {
-        throw new Error(data?.error || `Request failed with status ${res.status}`);
+      if (response.status !== 200) {
+        throw new Error("EmailJS did not accept the request.");
       }
 
       setStatus({
@@ -96,13 +146,12 @@ export default function ContactUs() {
         email: "",
         message: "",
       });
-    } catch (error) {
+    } catch (error: unknown) {
+      console.error("EmailJS send error:", error);
+
       setStatus({
         type: "error",
-        message:
-          error instanceof Error
-            ? error.message
-            : "Something went wrong. Please try again.",
+        message: getErrorMessage(error),
       });
     } finally {
       setIsSubmitting(false);
@@ -167,12 +216,15 @@ export default function ContactUs() {
                       value={form.name}
                       onChange={(v) => onChange("name", v)}
                     />
+
                     <Field
                       label="Email*"
                       placeholder="Johndoe@gmail.com"
                       value={form.email}
                       onChange={(v) => onChange("email", v)}
+                      type="email"
                     />
+
                     <Field
                       label="Message*"
                       placeholder="I was asking about...."
@@ -198,9 +250,16 @@ export default function ContactUs() {
                       <motion.button
                         type="submit"
                         disabled={isSubmitting}
-                        whileHover={{ y: isSubmitting ? 0 : -2, scale: isSubmitting ? 1 : 1.01 }}
+                        whileHover={{
+                          y: isSubmitting ? 0 : -2,
+                          scale: isSubmitting ? 1 : 1.01,
+                        }}
                         whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-                        transition={{ type: "spring", stiffness: 240, damping: 18 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 240,
+                          damping: 18,
+                        }}
                         className="h-[52px] flex-1 cursor-pointer rounded-[10px] font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
                         style={{
                           backgroundColor: RED,
@@ -214,9 +273,16 @@ export default function ContactUs() {
                         type="submit"
                         aria-label="Send"
                         disabled={isSubmitting}
-                        whileHover={{ y: isSubmitting ? 0 : -2, scale: isSubmitting ? 1 : 1.03 }}
+                        whileHover={{
+                          y: isSubmitting ? 0 : -2,
+                          scale: isSubmitting ? 1 : 1.03,
+                        }}
                         whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-                        transition={{ type: "spring", stiffness: 240, damping: 18 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 240,
+                          damping: 18,
+                        }}
                         className="grid h-[52px] w-[58px] cursor-pointer place-items-center rounded-[10px] disabled:cursor-not-allowed disabled:opacity-70"
                         style={{
                           backgroundColor: RED,
@@ -245,12 +311,14 @@ function Field({
   value,
   onChange,
   textarea = false,
+  type = "text",
 }: {
   label: string;
   placeholder: string;
   value: string;
   onChange: (v: string) => void;
   textarea?: boolean;
+  type?: React.HTMLInputTypeAttribute;
 }) {
   return (
     <div>
@@ -268,7 +336,7 @@ function Field({
         />
       ) : (
         <input
-          type={label.toLowerCase().includes("email") ? "email" : "text"}
+          type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
