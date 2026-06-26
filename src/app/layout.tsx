@@ -11,10 +11,26 @@ const godber = localFont({
 
 const kollektif = localFont({
   src: [
-    { path: "../assets/fonts/kollektif/Kollektif.ttf", weight: "400", style: "normal" },
-    { path: "../assets/fonts/kollektif/Kollektif-Italic.ttf", weight: "400", style: "italic" },
-    { path: "../assets/fonts/kollektif/Kollektif-Bold.ttf", weight: "700", style: "normal" },
-    { path: "../assets/fonts/kollektif/Kollektif-BoldItalic.ttf", weight: "700", style: "italic" },
+    {
+      path: "../assets/fonts/kollektif/Kollektif.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../assets/fonts/kollektif/Kollektif-Italic.ttf",
+      weight: "400",
+      style: "italic",
+    },
+    {
+      path: "../assets/fonts/kollektif/Kollektif-Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "../assets/fonts/kollektif/Kollektif-BoldItalic.ttf",
+      weight: "700",
+      style: "italic",
+    },
   ],
   variable: "--font-kollektif",
   display: "swap",
@@ -29,12 +45,11 @@ const cairo = Cairo({
 export const metadata: Metadata = {
   title: "Creators Hub",
   description: "Creators Hub — Social Media Agency",
-  icons: {
-    icon: "/favicon.svg",
-  },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
       lang="en"
@@ -42,9 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${godber.variable} ${kollektif.variable} ${cairo.variable} font-en`}
       suppressHydrationWarning
     >
-      <body suppressHydrationWarning>
-      {children}
-      </body>
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }
