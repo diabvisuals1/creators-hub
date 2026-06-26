@@ -1,4 +1,5 @@
 import Hero from "@/components/sections/Hero";
+import SiteIntro from "@/components/sections/SiteIntro";
 import WayWeWork from "@/components/sections/WayWeWork";
 import SelectedProjects from "@/components/sections/SelectedProjects";
 import Testimonials from "@/components/sections/Testimonials";
@@ -8,7 +9,7 @@ import Footer from "@/components/sections/Footer";
 
 export default function Home() {
   return (
-    <>
+    <SiteIntro>
       <Hero />
       <WayWeWork />
       <SelectedProjects />
@@ -16,6 +17,6 @@ export default function Home() {
       <ContactUs />
       <AboutUs />
       <Footer />
-    </>
+    </SiteIntro>
   );
 }

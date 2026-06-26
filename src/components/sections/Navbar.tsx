@@ -33,22 +33,21 @@ export default function Navbar() {
     setMenuOpen(false);
   };
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    const timeout = window.setTimeout(() => setMounted(true), 0);
+    return () => window.clearTimeout(timeout);
+  }, []);
 
   useEffect(() => {
-    if (!mounted) return;
-
     const onResize = () => {
       if (window.innerWidth >= 1024) setMenuOpen(false);
     };
 
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
-  }, [mounted]);
+  }, []);
 
   useEffect(() => {
-    if (!mounted) return;
-
     const onPointerDown = (e: PointerEvent) => {
       if (!navWrapRef.current) return;
       const target = e.target as Node;
@@ -66,7 +65,7 @@ export default function Navbar() {
       window.removeEventListener("pointerdown", onPointerDown);
       window.removeEventListener("scroll", onScroll);
     };
-  }, [mounted, menuOpen]);
+  }, [menuOpen]);
 
   useEffect(() => {
     if (!mounted) return;

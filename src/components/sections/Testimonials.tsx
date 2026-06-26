@@ -320,7 +320,7 @@ function TestimonialCardItem({
             itemProp="reviewBody"
             className="text-[15px] leading-[1.7] sm:text-[17px] lg:text-[20px]"
           >
-            "{card.quote}"
+            &ldquo;{card.quote}&rdquo;
           </p>
         </blockquote>
 

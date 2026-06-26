@@ -118,11 +118,8 @@ function ThumbImage({
   alt?: string;
   className?: string;
 }) {
-  const [failed, setFailed] = useState(false);
-
-  useEffect(() => {
-    setFailed(false);
-  }, [src]);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const failed = !!src && failedSrc === src;
 
   if (!src || failed) {
     return (
@@ -151,7 +148,7 @@ function ThumbImage({
       src={src}
       alt={alt}
       draggable={false}
-      onError={() => setFailed(true)}
+      onError={() => setFailedSrc(src)}
       className={className}
     />
   );
@@ -318,7 +315,9 @@ export default function SelectedProjects() {
       setDirection(nextDir);
       setIndex((i) => {
         const n = projects.length;
-        return (i + nextDir + n) % n;
+        const nextIndex = (i + nextDir + n) % n;
+        setThumbPage(Math.floor(nextIndex / THUMBS_PER_PAGE));
+        return nextIndex;
       });
     },
     [projects.length]
@@ -328,6 +327,7 @@ export default function SelectedProjects() {
     (nextIndex: number) => {
       if (nextIndex === index) return;
       setDirection(nextIndex > index ? 1 : -1);
+      setThumbPage(Math.floor(nextIndex / THUMBS_PER_PAGE));
       setIndex(nextIndex);
     },
     [index]
@@ -353,11 +353,6 @@ export default function SelectedProjects() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [go]);
-
-  useEffect(() => {
-    const nextPage = Math.floor(index / THUMBS_PER_PAGE);
-    setThumbPage(nextPage);
-  }, [index]);
 
   const startXRef = useRef<number | null>(null);
   const lastXRef = useRef<number | null>(null);
@@ -404,22 +399,22 @@ export default function SelectedProjects() {
   const [dur, setDur] = useState(0);
   const rafRef = useRef<number | null>(null);
 
-  const stopRAF = () => {
+  const stopRAF = useCallback(() => {
     if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
     rafRef.current = null;
-  };
+  }, []);
 
-  const tick = () => {
+  const tick = useCallback(function updateTime() {
     const v = videoRef.current;
     if (!v) return;
     setT(v.currentTime || 0);
-    rafRef.current = requestAnimationFrame(tick);
-  };
+    rafRef.current = requestAnimationFrame(updateTime);
+  }, []);
 
-  const startRAF = () => {
+  const startRAF = useCallback(() => {
     stopRAF();
     rafRef.current = requestAnimationFrame(tick);
-  };
+  }, [stopRAF, tick]);
 
   const togglePlay = () => {
     const v = videoRef.current;
@@ -447,20 +442,20 @@ export default function SelectedProjects() {
   useEffect(() => {
     if (!isFullscreen) {
       stopRAF();
-      setIsPlaying(false);
-      setT(0);
-      setDur(0);
-      return;
+      const resetTimer = window.setTimeout(() => {
+        setIsPlaying(false);
+        setT(0);
+        setDur(0);
+      }, 0);
+
+      return () => window.clearTimeout(resetTimer);
     }
 
-    if (isMobileView) {
-      setShowVideoUi(true);
-    } else {
-      setShowVideoUi(true);
-    }
-
+    const showTimer = window.setTimeout(() => setShowVideoUi(true), 0);
     const v = videoRef.current;
-    if (!v) return;
+    if (!v) {
+      return () => window.clearTimeout(showTimer);
+    }
 
     const onLoaded = () => setDur(v.duration || 0);
     const onPlay = () => {
@@ -486,16 +481,16 @@ export default function SelectedProjects() {
     v.play().catch(() => {});
 
     return () => {
+      window.clearTimeout(showTimer);
       v.removeEventListener("loadedmetadata", onLoaded);
       v.removeEventListener("play", onPlay);
       v.removeEventListener("pause", onPause);
       v.removeEventListener("ended", onEnded);
       stopRAF();
     };
-  }, [isFullscreen, active.id, muted, isMobileView]);
+  }, [isFullscreen, active.id, muted, startRAF, stopRAF]);
 
   const shouldShowDesktopUi = !isMobileView && showVideoUi;
-  const shouldShowMobileUi = isMobileView;
 
   return (
     <section
