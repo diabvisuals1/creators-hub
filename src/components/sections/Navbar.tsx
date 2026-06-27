@@ -208,11 +208,11 @@ export default function Navbar() {
                       hover:bg-[#00FFB6]/10
                       hover:shadow-[0_0_20px_rgba(0,255,182,0.25)]
                     "
-                    aria-label="Contact us"
+                    aria-label="Start a project"
                     onClick={() => setMenuOpen(false)}
                   >
                     <span className="uppercase tracking-[0.08em]">
-                      CONTACT US
+                      START A PROJECT
                     </span>
                     <FiArrowRight className="text-[18px]" />
                   </Link>
@@ -241,7 +241,7 @@ export default function Navbar() {
                       hover:bg-[#00FFB6]/10
                       hover:shadow-[0_0_20px_rgba(0,255,182,0.25)]
                     "
-                    aria-label="Contact us"
+                    aria-label="Start a project"
                     onClick={() => setMenuOpen(false)}
                   >
                     <FiArrowRight className="text-[18px]" />

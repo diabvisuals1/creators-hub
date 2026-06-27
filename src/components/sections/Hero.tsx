@@ -341,11 +341,11 @@ export default function Hero() {
                 >
                   <span className="block text-[34px] leading-[1.02] tracking-[-0.01em] sm:text-[52px] md:text-[66px]">
                     <span className="font-head">CREATORS HUB </span>
-                    <span className="font-bold">- YOUR</span>
+                    <span className="font-bold">-</span>
                   </span>
 
                   <span className="block text-[34px] font-bold leading-[1.02] tracking-[-0.01em] sm:text-[52px] md:text-[66px]">
-                    CONTENT, FULLY MANAGED
+                    CRAFTED TO CAPTIVATE
                   </span>
                 </motion.h1>
 
@@ -360,7 +360,7 @@ export default function Hero() {
                   }}
                   className="mt-5 max-w-[620px] px-2 text-[14px] font-medium leading-[1.6] text-[#151A43]/85 sm:mt-6 sm:text-[18px]"
                 >
-                  From roadmap design to global scaling, we handle your entire content lifecycle.
+                  From raw footage to platform-ready content, we craft the creative production that makes your brand stand out.
                 </motion.p>
 
                 <motion.div
@@ -376,10 +376,10 @@ export default function Hero() {
                 >
                   <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
                     <Link
-                      href="/contact"
+                      href="#our-work"
                       className="flex h-[48px] items-center justify-center rounded-[8px] bg-[#FF1E1E] px-6 text-[13px] font-semibold text-white transition-shadow duration-300 hover:shadow-[0_10px_30px_rgba(255,30,30,0.22)] sm:h-[54px] sm:px-8 sm:text-[14px]"
                     >
-                      Scale My Content
+                      View Our Work
                     </Link>
                   </motion.div>
 

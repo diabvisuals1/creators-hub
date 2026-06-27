@@ -94,7 +94,7 @@ function WayWeWork() {
               progress={scrollYProgress}
               strength={120}
               dragBoundsRef={dragBoundsRef}
-              label="DISCOVERY & STRATEGY"
+              label="BRIEF & DIRECTION"
               className="left-[34%] top-[16%] sm:left-[25%] sm:top-[20%]"
               trail="left"
               pillClass="bg-white text-[#B7AE00]"
@@ -104,7 +104,7 @@ function WayWeWork() {
               progress={scrollYProgress}
               strength={140}
               dragBoundsRef={dragBoundsRef}
-              label="PROFESSIONALISM"
+              label="EDITING & DESIGN"
               className="left-[74%] top-[10%] sm:left-[84%] sm:top-[16%]"
               trail="right"
               pillClass="bg-[#151B3A] text-white"
@@ -114,7 +114,7 @@ function WayWeWork() {
               progress={scrollYProgress}
               strength={150}
               dragBoundsRef={dragBoundsRef}
-              label="CREATIVE PRODUCTION & DESIGN"
+              label="REVIEW & REFINEMENT"
               className="left-[72%] top-[24%] sm:left-[58%] sm:top-[30%]"
               trail="right"
               pillClass="bg-[#3F7BFF] text-white"
@@ -124,7 +124,7 @@ function WayWeWork() {
               progress={scrollYProgress}
               strength={110}
               dragBoundsRef={dragBoundsRef}
-              label="TRANSPARENCY"
+              label="PLATFORM-READY DELIVERY"
               className="left-1/2 top-[55%] sm:left-[46%] sm:top-[54%]"
               trail="left"
               pillClass="bg-[#10E6C6] text-[#08352F]"
@@ -134,21 +134,11 @@ function WayWeWork() {
               progress={scrollYProgress}
               strength={150}
               dragBoundsRef={dragBoundsRef}
-              label="ANALYSIS & OPTIMIZATION"
+              label="CREATIVE CONSISTENCY"
               className="left-[30%] top-[72%] sm:left-[16%] sm:top-[68%]"
               trail="left"
               pillClass="bg-[#151B3A] text-white"
               trailClass="bg-[#151B3A]/30"
-            />
-            <AirPill
-              progress={scrollYProgress}
-              strength={170}
-              dragBoundsRef={dragBoundsRef}
-              label="EXECUTION & MANAGEMENT"
-              className="left-[64%] top-[86%] sm:left-[64%] sm:top-[82%]"
-              trail="right"
-              pillClass="bg-[#C0183C] text-white"
-              trailClass="bg-[#B58C0E]/45"
             />
           </div>
         </div>
