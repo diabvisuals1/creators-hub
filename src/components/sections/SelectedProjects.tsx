@@ -3,15 +3,37 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import {
+  Clapperboard,
+  Smartphone,
+  Mic,
+  MessageCircle,
+  Image as ImageIcon,
+  Sparkles,
+  type LucideIcon,
+} from "lucide-react";
 
-type Project = {
+type Kind = "video" | "vertical" | "gallery";
+
+type Item = {
+  id: string;
+  title: string;
+  poster: string;
+  video?: string;
+};
+
+type Category = {
   id: string;
   label: string;
-  video: string;
-  subtitle?: string;
-  paragraphs?: string[];
-  poster: string;
-  thumbs?: string[];
+  name: string;
+  Icon: LucideIcon;
+  kind: Kind;
+  accent: string;
+  emoji: string;
+  subtitle: string;
+  blurb: string[];
+  items: Item[];
+  galleryRatio?: string;
 };
 
 const popIn = (delay = 0) => ({
@@ -86,7 +108,7 @@ const labelVariants = {
 
 const R = 5.33;
 const LABEL_MARGIN = 16;
-const THUMBS_PER_PAGE = 5;
+const THUMBS_PER_PAGE = 6;
 
 const VIDEO_ICONS = {
   play: "/video-icons/play.svg",
@@ -97,6 +119,8 @@ const VIDEO_ICONS = {
   prev: "/video-icons/prev.svg",
   next: "/video-icons/next.svg",
 };
+
+const T = (n: number) => `/projects/thumbs/t${n}.jpg`;
 
 function clamp(n: number, a: number, b: number) {
   return Math.max(a, Math.min(b, n));
@@ -183,120 +207,165 @@ function IconImg({
 }
 
 export default function SelectedProjects() {
-  const projects: Project[] = useMemo(
+  const categories: Category[] = useMemo(
     () => [
       {
-        id: "p1",
-        label: "KAI CENAT / NEW MERCH",
-        video: "/projects/kai.mp4",
-        subtitle: "[SELECTED PROJECTS]",
-        paragraphs: [
-          "In this collaboration, our design team spearheaded the creative development and technical execution for Kai Cenat’s signature apparel line.",
-          "Our work focused on bridging the gap between high-energy creator culture and premium streetwear aesthetics.",
+        id: "longform",
+        label: "LONG-FORM / VIDEOS",
+        name: "Long-Form Videos",
+        Icon: Clapperboard,
+        kind: "video",
+        accent: "#FF1E1E",
+        emoji: "🎬",
+        subtitle: "[ LONG-FORM VIDEOS ]",
+        blurb: [
+          "Full YouTube edits for creators, lifestyle, and gaming — shaped around pacing, retention, and clear storytelling.",
+          "From raw footage to a final export tuned for the platform, every cut is built to keep viewers watching.",
         ],
-        poster: "/projects/thumbs/t1.jpg",
-        thumbs: [
-          "/projects/thumbs/t1.jpg",
-          "/projects/thumbs/t2.jpg",
-          "/projects/thumbs/t3.jpg",
-          "/projects/thumbs/t4.jpg",
-          "/projects/thumbs/t5.jpg",
-          "/projects/thumbs/t6.jpg",
-        ],
-      },
-      {
-        id: "p2",
-        label: "PROJECT TWO / PROMO",
-        video: "/projects/p2.mp4",
-        subtitle: "[SELECTED PROJECTS]",
-        paragraphs: [
-          "This project centered on building a sharper promotional narrative with fast visual hooks and a more direct conversion-focused edit structure.",
-          "We combined polished pacing, thumbnail strategy, and platform-native motion cues to keep the campaign punchy and memorable.",
-        ],
-        poster: "/projects/thumbs/t2.jpg",
-        thumbs: [
-          "/projects/thumbs/t2.jpg",
-          "/projects/thumbs/t1.jpg",
-          "/projects/thumbs/t3.jpg",
-          "/projects/thumbs/t4.jpg",
-          "/projects/thumbs/t5.jpg",
-          "/projects/thumbs/t6.jpg",
+        items: [
+          { id: "lf1", title: "EP. 01 / ISLAND CHALLENGE", poster: T(1), video: "/projects/p3.mp4" },
+          { id: "lf2", title: "EP. 02 / 24H SURVIVAL", poster: T(2), video: "/projects/p4.mp4" },
+          { id: "lf3", title: "EP. 03 / $1 VS $1M", poster: T(3), video: "/projects/p5.mp4" },
+          { id: "lf4", title: "EP. 04 / WORLD TOUR", poster: T(4), video: "/projects/p2.mp4" },
+          { id: "lf5", title: "EP. 05 / MEGA BUILD", poster: T(5), video: "/projects/kai.mp4" },
+          { id: "lf6", title: "EP. 06 / FINAL ROUND", poster: T(6), video: "/projects/p3.mp4" },
         ],
       },
       {
-        id: "p3",
-        label: "PROJECT THREE / CAMPAIGN",
-        video: "/projects/p3.mp4",
-        subtitle: "[SELECTED PROJECTS]",
-        paragraphs: [
-          "For this campaign, we refined the storytelling around a single hero concept and designed the visuals to feel more cinematic while staying performance-first.",
-          "The final delivery balanced brand identity, speed, and clarity to support both reach and retention across social placements.",
+        id: "shorts",
+        label: "SHORTS / REELS",
+        name: "Shorts / Reels",
+        Icon: Smartphone,
+        kind: "vertical",
+        accent: "#00D27A",
+        emoji: "⚡",
+        subtitle: "[ SHORTS & REELS ]",
+        blurb: [
+          "Short-form vertical edits for Reels, Shorts, and TikTok — fast hooks, punchy captions, and snappy sound design.",
+          "Built for the first three seconds, so the scroll stops and the replay starts.",
         ],
-        poster: "/projects/thumbs/t3.jpg",
-        thumbs: [
-          "/projects/thumbs/t3.jpg",
-          "/projects/thumbs/t1.jpg",
-          "/projects/thumbs/t2.jpg",
-          "/projects/thumbs/t4.jpg",
-          "/projects/thumbs/t5.jpg",
-          "/projects/thumbs/t6.jpg",
-        ],
-      },
-      {
-        id: "p4",
-        label: "PROJECT FOUR / EDIT",
-        video: "/projects/p4.mp4",
-        subtitle: "[SELECTED PROJECTS]",
-        paragraphs: [
-          "This edit leaned into tension, rhythm, and visual contrast to create a stronger emotional pull from the opening seconds.",
-          "Our team focused on shot sequencing, motion emphasis, and sound-driven timing to give the piece a more premium finish.",
-        ],
-        poster: "/projects/thumbs/t4.jpg",
-        thumbs: [
-          "/projects/thumbs/t4.jpg",
-          "/projects/thumbs/t1.jpg",
-          "/projects/thumbs/t2.jpg",
-          "/projects/thumbs/t3.jpg",
-          "/projects/thumbs/t5.jpg",
-          "/projects/thumbs/t6.jpg",
+        items: [
+          { id: "sh1", title: "REEL / HOOK 01", poster: T(5), video: "/projects/p2.mp4" },
+          { id: "sh2", title: "REEL / VIRAL CUT", poster: T(4), video: "/projects/kai.mp4" },
+          { id: "sh3", title: "SHORT / POV", poster: T(6), video: "/projects/p2.mp4" },
+          { id: "sh4", title: "REEL / TREND 02", poster: T(1), video: "/projects/kai.mp4" },
+          { id: "sh5", title: "SHORT / CHALLENGE", poster: T(2), video: "/projects/p2.mp4" },
+          { id: "sh6", title: "REEL / TEASER", poster: T(3), video: "/projects/kai.mp4" },
         ],
       },
       {
-        id: "p5",
-        label: "PROJECT FIVE / SHORT",
-        video: "/projects/p5.mp4",
-        subtitle: "[SELECTED PROJECTS]",
-        paragraphs: [
-          "This short-form piece was developed to maximize attention in the first seconds while keeping the edit compact, energetic, and highly shareable.",
-          "We shaped the final cut around immediate visual payoff, stronger title readability, and a pacing system built for repeat views.",
+        id: "event",
+        label: "EVENT / CONTENT",
+        name: "Event Content",
+        Icon: Mic,
+        kind: "video",
+        accent: "#F3D000",
+        emoji: "🎤",
+        subtitle: "[ EVENT CONTENT ]",
+        blurb: [
+          "Hype promo edits, live screen visuals, and recap videos that relive the moment.",
+          "Plus sponsor and partner visuals that keep the whole production looking sharp and on-brand.",
         ],
-        poster: "/projects/thumbs/t5.jpg",
-        thumbs: [
-          "/projects/thumbs/t5.jpg",
-          "/projects/thumbs/t1.jpg",
-          "/projects/thumbs/t2.jpg",
-          "/projects/thumbs/t3.jpg",
-          "/projects/thumbs/t4.jpg",
-          "/projects/thumbs/t6.jpg",
+        items: [
+          { id: "ev1", title: "EVENT / AFTERMOVIE", poster: T(4), video: "/projects/p4.mp4" },
+          { id: "ev2", title: "EVENT / PROMO", poster: T(6), video: "/projects/p5.mp4" },
+          { id: "ev3", title: "EVENT / RECAP", poster: T(2), video: "/projects/p3.mp4" },
+          { id: "ev4", title: "STAGE / VISUALS", poster: T(1), video: "/projects/p4.mp4" },
+          { id: "ev5", title: "EVENT / TEASER", poster: T(3), video: "/projects/p5.mp4" },
+          { id: "ev6", title: "EVENT / HIGHLIGHTS", poster: T(5), video: "/projects/p3.mp4" },
+        ],
+      },
+      {
+        id: "social",
+        label: "SOCIAL / MEDIA",
+        name: "Social Media",
+        Icon: MessageCircle,
+        kind: "gallery",
+        accent: "#4186FF",
+        emoji: "💬",
+        subtitle: "[ SOCIAL MEDIA ]",
+        blurb: [
+          "Feed posts, story sets, and reel covers designed to keep a profile consistent, recognizable, and scroll-stopping.",
+          "Built as a system, so every placement looks like it belongs to the same brand.",
+        ],
+        galleryRatio: "4 / 5",
+        items: [
+          { id: "so1", title: "FEED / POST 01", poster: T(1) },
+          { id: "so2", title: "STORY / SET 01", poster: T(2) },
+          { id: "so3", title: "REEL / COVER", poster: T(3) },
+          { id: "so4", title: "FEED / POST 02", poster: T(4) },
+          { id: "so5", title: "STORY / SET 02", poster: T(5) },
+          { id: "so6", title: "CAROUSEL / 01", poster: T(6) },
+        ],
+      },
+      {
+        id: "thumbnails",
+        label: "THUMBNAIL / DESIGNS",
+        name: "Thumbnails",
+        Icon: ImageIcon,
+        kind: "gallery",
+        accent: "#FF7A1A",
+        emoji: "🖼️",
+        subtitle: "[ THUMBNAILS ]",
+        blurb: [
+          "Scroll-stopping YouTube thumbnails engineered for contrast, clarity, and curiosity — the difference between a click and a skip.",
+          "Each design is tested for readability at every size, from desktop to the smallest mobile feed.",
+        ],
+        galleryRatio: "16 / 9",
+        items: [
+          { id: "th1", title: "THUMB / 01", poster: T(3) },
+          { id: "th2", title: "THUMB / 02", poster: T(1) },
+          { id: "th3", title: "THUMB / 03", poster: T(2) },
+          { id: "th4", title: "THUMB / 04", poster: T(4) },
+          { id: "th5", title: "THUMB / 05", poster: T(5) },
+          { id: "th6", title: "THUMB / 06", poster: T(6) },
+        ],
+      },
+      {
+        id: "branding",
+        label: "BRANDING / & DESIGN",
+        name: "Branding & Design",
+        Icon: Sparkles,
+        kind: "gallery",
+        accent: "#A855F7",
+        emoji: "✨",
+        subtitle: "[ BRANDING & DESIGN ]",
+        blurb: [
+          "Logos, color and typography systems, and brand direction that make a presence feel professional and consistent.",
+          "Delivered with ready-to-use assets and guidelines, so the brand stays sharp across every platform.",
+        ],
+        galleryRatio: "4 / 3",
+        items: [
+          { id: "br1", title: "LOGO / SYSTEM", poster: T(6) },
+          { id: "br2", title: "BRAND / GUIDE", poster: T(5) },
+          { id: "br3", title: "COLOR / PALETTE", poster: T(4) },
+          { id: "br4", title: "TYPE / SYSTEM", poster: T(3) },
+          { id: "br5", title: "BRAND / KIT", poster: T(2) },
+          { id: "br6", title: "IDENTITY / 01", poster: T(1) },
         ],
       },
     ],
     []
   );
 
-  const [index, setIndex] = useState(0);
+  const [catIndex, setCatIndex] = useState(0);
+  const [itemIndex, setItemIndex] = useState(0);
   const [direction, setDirection] = useState<1 | -1>(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showVideoUi, setShowVideoUi] = useState(true);
   const [thumbPage, setThumbPage] = useState(0);
   const [isMobileView, setIsMobileView] = useState(false);
 
-  const active = projects[index];
-  const activePoster = active.poster;
+  const activeCat = categories[catIndex];
+  const items = activeCat.items;
+  const activeItem = items[itemIndex];
+  const activePoster = activeItem.poster;
+  const isGallery = activeCat.kind === "gallery";
+  const isVertical = activeCat.kind === "vertical";
 
-  const totalThumbPages = Math.max(1, Math.ceil(projects.length / THUMBS_PER_PAGE));
+  const totalThumbPages = Math.max(1, Math.ceil(items.length / THUMBS_PER_PAGE));
   const currentThumbPage = clamp(thumbPage, 0, totalThumbPages - 1);
-  const visibleThumbs = projects.slice(
+  const visibleThumbs = items.slice(
     currentThumbPage * THUMBS_PER_PAGE,
     currentThumbPage * THUMBS_PER_PAGE + THUMBS_PER_PAGE
   );
@@ -310,28 +379,50 @@ export default function SelectedProjects() {
     [totalThumbPages]
   );
 
+  /** navigate items WITHIN the active category */
   const go = useCallback(
     (nextDir: 1 | -1) => {
       setDirection(nextDir);
-      setIndex((i) => {
-        const n = projects.length;
+      setItemIndex((i) => {
+        const n = items.length;
         const nextIndex = (i + nextDir + n) % n;
         setThumbPage(Math.floor(nextIndex / THUMBS_PER_PAGE));
         return nextIndex;
       });
     },
-    [projects.length]
+    [items.length]
   );
 
-  const goToIndex = useCallback(
+  const goToItem = useCallback(
     (nextIndex: number) => {
-      if (nextIndex === index) return;
-      setDirection(nextIndex > index ? 1 : -1);
+      if (nextIndex === itemIndex) return;
+      setDirection(nextIndex > itemIndex ? 1 : -1);
       setThumbPage(Math.floor(nextIndex / THUMBS_PER_PAGE));
-      setIndex(nextIndex);
+      setItemIndex(nextIndex);
     },
-    [index]
+    [itemIndex]
   );
+
+  /** switch to a whole category */
+  const selectCategory = useCallback(
+    (nextCat: number, dir?: 1 | -1) => {
+      setDirection(dir ?? (nextCat > catIndex ? 1 : -1));
+      setCatIndex(nextCat);
+      setItemIndex(0);
+      setThumbPage(0);
+    },
+    [catIndex]
+  );
+
+  const prevCategory = useCallback(() => {
+    const n = categories.length;
+    selectCategory((catIndex - 1 + n) % n, -1);
+  }, [catIndex, categories.length, selectCategory]);
+
+  const nextCategory = useCallback(() => {
+    const n = categories.length;
+    selectCategory((catIndex + 1) % n, 1);
+  }, [catIndex, categories.length, selectCategory]);
 
   useEffect(() => {
     const updateViewport = () => {
@@ -440,7 +531,7 @@ export default function SelectedProjects() {
   };
 
   useEffect(() => {
-    if (!isFullscreen) {
+    if (!isFullscreen || isGallery) {
       stopRAF();
       const resetTimer = window.setTimeout(() => {
         setIsPlaying(false);
@@ -488,7 +579,7 @@ export default function SelectedProjects() {
       v.removeEventListener("ended", onEnded);
       stopRAF();
     };
-  }, [isFullscreen, active.id, muted, startRAF, stopRAF]);
+  }, [isFullscreen, isGallery, activeItem.id, muted, startRAF, stopRAF]);
 
   const shouldShowDesktopUi = !isMobileView && showVideoUi;
 
@@ -510,7 +601,7 @@ export default function SelectedProjects() {
       />
 
       <div className="relative z-30 w-full py-14 sm:py-20 lg:py-24">
-        <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-6">
+        <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-8 lg:pl-[max(24px,calc((100vw-1240px)/2+24px))]">
           {/* LEFT */}
           <div
             className="
@@ -518,7 +609,7 @@ export default function SelectedProjects() {
               flex w-full flex-col items-center
               px-4 text-center text-[#151A43]
               sm:px-6
-              lg:w-[390px] lg:shrink-0 lg:items-start lg:pl-[max(54px,calc((100vw-1152px)/2+54px))] lg:text-left
+              lg:w-[440px] lg:shrink-0 lg:items-start lg:px-0 lg:text-left
             "
           >
             <div className="pointer-events-none absolute left-0 top-1/2 hidden -translate-x-[118px] -translate-y-1/2 lg:block">
@@ -569,15 +660,85 @@ export default function SelectedProjects() {
               PROJECTS
             </motion.h2>
 
-            <div className="mt-10 flex w-[280px] items-center justify-center gap-[6px] lg:justify-start">
-              {projects.map((p, i) => (
-                <span
-                  key={p.id}
-                  aria-hidden="true"
+            <motion.p
+              className="mt-5 max-w-[420px] text-[15px] leading-[1.7] text-[#151A43]/85 sm:text-[16px]"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.16, duration: 0.5, ease: "easeOut" }}
+            >
+              From long-form videos to social content and brand design, explore how
+              we help creators and brands show up with impact.
+            </motion.p>
+
+            {/* category pills */}
+            <div className="mt-7 flex w-full max-w-[420px] flex-wrap justify-center gap-2.5 lg:justify-start">
+              {categories.map((c, i) => {
+                const activePill = i === catIndex;
+                const PillIcon = c.Icon;
+
+                return (
+                  <motion.button
+                    key={c.id}
+                    type="button"
+                    aria-label={`Show ${c.name}`}
+                    aria-pressed={activePill}
+                    onClick={() => selectCategory(i)}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      delay: 0.22 + i * 0.05,
+                      type: "spring",
+                      stiffness: 220,
+                      damping: 18,
+                    }}
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.96 }}
+                    className="relative flex cursor-pointer items-center gap-2 rounded-full px-4 py-2.5 text-[12px] font-bold tracking-tight transition-colors duration-300 sm:text-[13px]"
+                    style={{
+                      border: `1.5px solid ${
+                        activePill ? "#151A43" : "rgba(21,26,67,0.26)"
+                      }`,
+                      color: activePill ? "#FFFFFF" : "#151A43",
+                    }}
+                  >
+                    {activePill && (
+                      <motion.span
+                        layoutId="catPillBg"
+                        aria-hidden="true"
+                        className="absolute inset-0 rounded-full bg-[#151A43]"
+                        transition={{ type: "spring", stiffness: 320, damping: 30 }}
+                      />
+                    )}
+
+                    <span className="relative z-10 flex items-center gap-2">
+                      <PillIcon
+                        size={15}
+                        strokeWidth={2.4}
+                        style={{ color: activePill ? c.accent : "#151A43" }}
+                      />
+                      {c.name}
+                    </span>
+                  </motion.button>
+                );
+              })}
+            </div>
+
+            {/* per-category project dots */}
+            <div className="mt-7 flex w-full max-w-[300px] items-center justify-center gap-[6px] lg:justify-start">
+              {items.map((it, i) => (
+                <button
+                  key={it.id}
+                  type="button"
+                  aria-label={`Go to ${it.title}`}
+                  onClick={() => goToItem(i)}
                   className={[
-                    "h-[4px] rounded-full transition-all duration-300",
-                    i === index ? "w-[86px] bg-[#151A43]" : "w-[38px] bg-[#151A43]/35",
+                    "h-[5px] cursor-pointer rounded-full transition-all duration-300",
+                    i === itemIndex ? "w-[44px]" : "w-[18px]",
                   ].join(" ")}
+                  style={{
+                    backgroundColor:
+                      i === itemIndex ? activeCat.accent : "rgba(21,26,67,0.25)",
+                  }}
                 />
               ))}
             </div>
@@ -668,7 +829,7 @@ export default function SelectedProjects() {
                   >
                     <AnimatePresence mode="wait" custom={direction} initial={false}>
                       <motion.div
-                        key={active.id}
+                        key={activeItem.id}
                         custom={direction}
                         variants={cardSwapVariants}
                         initial="enter"
@@ -681,7 +842,7 @@ export default function SelectedProjects() {
                       >
                         <ThumbImage
                           src={activePoster}
-                          alt={active.label}
+                          alt={activeItem.title}
                           className="absolute inset-0 h-full w-full object-cover select-none"
                         />
 
@@ -695,17 +856,32 @@ export default function SelectedProjects() {
                           }}
                         />
 
+                        {/* playful category badge (top-left) */}
+                        <motion.div
+                          className="pointer-events-none absolute left-[78px] top-[26px] z-[55] flex items-center gap-2 rounded-full px-3 py-1.5 text-[12px] font-extrabold tracking-[0.08em] backdrop-blur sm:left-[96px]"
+                          style={{
+                            backgroundColor: `${activeCat.accent}EE`,
+                            color: "#0B0F2A",
+                            boxShadow: `0 8px 22px ${activeCat.accent}66`,
+                          }}
+                          initial={{ opacity: 0, y: -8, scale: 0.9 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          transition={{ delay: 0.12, type: "spring", stiffness: 200, damping: 16 }}
+                        >
+                          <span aria-hidden="true">{activeCat.emoji}</span>
+                          {activeCat.label.split("/")[0]?.trim()}
+                        </motion.div>
+
                         <button
                           data-play-btn
                           type="button"
-                          aria-label="Play video"
+                          aria-label={isGallery ? "Explore gallery" : "Play video"}
                           onPointerDownCapture={(e) => e.stopPropagation()}
                           onClick={(e) => {
                             e.stopPropagation();
                             setIsFullscreen(true);
                           }}
-                          className="absolute left-1/2 top-1/2 z-[60] -translate-x-1/2 -translate-y-1/2 cursor-pointer"
-                          style={{ width: 96, height: 96 }}
+                          className="absolute left-1/2 top-1/2 z-[60] flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-3 cursor-pointer"
                         >
                           <motion.img
                             src="/playicon.svg"
@@ -713,8 +889,18 @@ export default function SelectedProjects() {
                             draggable={false}
                             whileHover={{ scale: 1.08 }}
                             whileTap={{ scale: 0.94 }}
+                            animate={{ y: [0, -5, 0] }}
+                            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
                             style={{ width: 96, height: 96, cursor: "pointer" }}
                           />
+                          <motion.span
+                            className="rounded-full px-3 py-1 text-[11px] font-extrabold tracking-[0.22em]"
+                            style={{ backgroundColor: "#ffffff", color: activeCat.accent }}
+                            animate={{ opacity: [0.75, 1, 0.75] }}
+                            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                          >
+                            {isGallery ? "EXPLORE" : "WATCH"}
+                          </motion.span>
                         </button>
                       </motion.div>
                     </AnimatePresence>
@@ -744,7 +930,7 @@ export default function SelectedProjects() {
                       >
                         <AnimatePresence mode="wait" custom={direction} initial={false}>
                           <motion.div
-                            key={active.id + "-label"}
+                            key={activeItem.id + "-label"}
                             custom={direction}
                             variants={labelVariants}
                             initial="enter"
@@ -755,14 +941,14 @@ export default function SelectedProjects() {
                               fontFamily: "var(--font-godber)",
                               fontWeight: 400,
                               fontSize: "clamp(18px,2.2vw,36px)",
-                              color: "#FF1E1E",
+                              color: activeCat.accent,
                               whiteSpace: "nowrap",
                               overflow: "hidden",
                               textOverflow: "ellipsis",
                               padding: "0 16px",
                             }}
                           >
-                            {active.label}
+                            {activeItem.title}
                           </motion.div>
                         </AnimatePresence>
                       </div>
@@ -783,30 +969,44 @@ export default function SelectedProjects() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onMouseEnter={() => {
-              if (!isMobileView) setShowVideoUi(true);
+              if (!isMobileView && !isGallery) setShowVideoUi(true);
             }}
             onMouseLeave={() => {
-              if (!isMobileView) setShowVideoUi(false);
+              if (!isMobileView && !isGallery) setShowVideoUi(false);
             }}
             onMouseMove={() => {
-              if (!isMobileView) setShowVideoUi(true);
+              if (!isMobileView && !isGallery) setShowVideoUi(true);
             }}
           >
-            {isMobileView ? (
+            {isGallery ? (
+              <GalleryFullscreen
+                category={activeCat}
+                categories={categories}
+                catIndex={catIndex}
+                isMobile={isMobileView}
+                onClose={() => setIsFullscreen(false)}
+                onPrevCat={prevCategory}
+                onNextCat={nextCategory}
+                onSelectCategory={(i) => selectCategory(i)}
+              />
+            ) : isMobileView ? (
               <>
                 <div className="absolute inset-0 bg-[#06111B]" />
 
                 <div className="absolute left-4 right-4 top-4 z-[240] pr-14 text-white">
-                  <div className="text-[10px] font-semibold tracking-[0.16em] opacity-85">
-                    {active.subtitle ?? "[SELECTED PROJECTS]"}
+                  <div
+                    className="text-[10px] font-semibold tracking-[0.16em]"
+                    style={{ color: activeCat.accent }}
+                  >
+                    {activeCat.subtitle}
                   </div>
 
                   <div className="mt-4 font-extrabold leading-[0.9] tracking-tight">
-                    <div className="text-[34px]">
-                      {active.label.split("/")[0]?.trim()}
+                    <div className="text-[30px]">
+                      {activeItem.title.split("/")[0]?.trim()}
                     </div>
-                    <div className="text-[34px]">
-                      / {active.label.split("/")[1]?.trim()}
+                    <div className="text-[30px]">
+                      / {activeItem.title.split("/")[1]?.trim()}
                     </div>
                   </div>
                 </div>
@@ -820,11 +1020,18 @@ export default function SelectedProjects() {
                   <IconImg src={VIDEO_ICONS.close} alt="Close" size={14} />
                 </button>
 
-                <div className="absolute left-0 right-0 top-[132px] z-[220] px-3">
-                  <div className="relative mx-auto aspect-[16/9] w-full overflow-hidden rounded-[18px] border border-white/10 bg-black shadow-[0_20px_40px_rgba(0,0,0,0.34)]">
+                <div className="absolute left-0 right-0 top-[128px] z-[220] px-3">
+                  <div
+                    className={[
+                      "relative mx-auto w-full overflow-hidden border border-white/10 bg-black shadow-[0_20px_40px_rgba(0,0,0,0.34)]",
+                      isVertical
+                        ? "aspect-[9/16] max-w-[248px] rounded-[22px]"
+                        : "aspect-[16/9] rounded-[18px]",
+                    ].join(" ")}
+                  >
                     <video
                       ref={videoRef}
-                      src={active.video}
+                      src={activeItem.video}
                       poster={activePoster}
                       className="absolute inset-0 h-full w-full object-cover"
                       playsInline
@@ -885,8 +1092,11 @@ export default function SelectedProjects() {
                       <div className="relative flex-1">
                         <div className="relative h-[5px] rounded-full bg-white/20">
                           <div
-                            className="absolute left-0 top-0 h-[5px] rounded-full bg-white"
-                            style={{ width: `${dur > 0 ? (t / dur) * 100 : 0}%` }}
+                            className="absolute left-0 top-0 h-[5px] rounded-full"
+                            style={{
+                              width: `${dur > 0 ? (t / dur) * 100 : 0}%`,
+                              backgroundColor: activeCat.accent,
+                            }}
                           />
                           <input
                             type="range"
@@ -924,7 +1134,7 @@ export default function SelectedProjects() {
                             "linear-gradient(180deg, rgba(0,0,0,1) 72%, rgba(0,0,0,0.45) 88%, rgba(0,0,0,0) 100%)",
                         }}
                       >
-                        {(active.paragraphs ?? []).join(" ")}
+                        {activeCat.blurb.join(" ")}
                       </p>
                     </div>
 
@@ -933,7 +1143,7 @@ export default function SelectedProjects() {
                         type="button"
                         onClick={() => go(-1)}
                         className="grid h-[42px] w-[42px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/10"
-                        aria-label="Previous video"
+                        aria-label="Previous project"
                       >
                         <IconImg src={VIDEO_ICONS.prev} alt="Previous" size={16} />
                       </button>
@@ -947,35 +1157,34 @@ export default function SelectedProjects() {
                           msOverflowStyle: "none",
                         }}
                       >
-                        {projects.map((project, i) => {
-                          const thumbSrc =
-                            project.thumbs?.[0] || project.poster || activePoster;
-                          const activeThumb = i === index;
+                        {items.map((it, i) => {
+                          const thumbSrc = it.poster || activePoster;
+                          const activeThumb = i === itemIndex;
 
                           return (
                             <button
-                              key={project.id}
+                              key={it.id}
                               type="button"
-                              onClick={() => goToIndex(i)}
-                              aria-label={`Open ${project.label}`}
+                              onClick={() => goToItem(i)}
+                              aria-label={`Open ${it.title}`}
                               className="relative shrink-0 overflow-hidden rounded-[8px] transition-all duration-300"
                               style={{
-                                width: activeThumb ? 136 : 104,
-                                height: activeThumb ? 82 : 72,
+                                width: activeThumb ? 130 : 100,
+                                height: activeThumb ? 80 : 70,
                                 scrollSnapAlign: "center",
                                 opacity: activeThumb ? 1 : 0.86,
                                 transform: activeThumb ? "translateY(-2px)" : "translateY(0px)",
                                 border: activeThumb
-                                  ? "1px solid rgba(0,255,182,0.95)"
+                                  ? `1px solid ${activeCat.accent}`
                                   : "1px solid rgba(255,255,255,0.10)",
                                 boxShadow: activeThumb
-                                  ? "0 0 0 2px rgba(0,255,182,0.90), 0 0 0 5px rgba(0,255,182,0.14), 0 12px 28px rgba(0,255,182,0.18)"
+                                  ? `0 0 0 2px ${activeCat.accent}, 0 0 0 5px ${activeCat.accent}24, 0 12px 28px ${activeCat.accent}2e`
                                   : "0 8px 18px rgba(0,0,0,0.22)",
                               }}
                             >
                               <ThumbImage
                                 src={thumbSrc}
-                                alt={project.label}
+                                alt={it.title}
                                 className="absolute inset-0 h-full w-full object-cover"
                               />
 
@@ -983,7 +1192,7 @@ export default function SelectedProjects() {
                                 className="absolute inset-0"
                                 style={{
                                   background: activeThumb
-                                    ? "linear-gradient(180deg, rgba(0,255,182,0.04) 0%, rgba(0,255,182,0.14) 100%)"
+                                    ? `linear-gradient(180deg, ${activeCat.accent}10 0%, ${activeCat.accent}2e 100%)`
                                     : "linear-gradient(180deg, rgba(0,0,0,0.06) 0%, rgba(0,0,0,0.30) 100%)",
                                 }}
                               />
@@ -996,7 +1205,7 @@ export default function SelectedProjects() {
                         type="button"
                         onClick={() => go(1)}
                         className="grid h-[42px] w-[42px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/10"
-                        aria-label="Next video"
+                        aria-label="Next project"
                       >
                         <IconImg src={VIDEO_ICONS.next} alt="Next" size={16} />
                       </button>
@@ -1006,16 +1215,47 @@ export default function SelectedProjects() {
               </>
             ) : (
               <>
-                <video
-                  ref={videoRef}
-                  src={active.video}
-                  poster={activePoster}
-                  className="absolute inset-0 h-full w-full object-cover"
-                  playsInline
-                  muted={muted}
-                  controls={false}
-                  preload="metadata"
-                />
+                {isVertical && (
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0"
+                    style={{
+                      backgroundImage: `url('${activePoster}')`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      filter: "blur(46px) brightness(0.42)",
+                      transform: "scale(1.16)",
+                    }}
+                  />
+                )}
+
+                {isVertical ? (
+                  <div className="absolute inset-0 grid place-items-center">
+                    <div className="relative aspect-[9/16] h-[min(86vh,860px)] max-w-[94vw] overflow-hidden rounded-[26px] border border-white/12 bg-black shadow-[0_30px_80px_rgba(0,0,0,0.5)]">
+                      <video
+                        ref={videoRef}
+                        src={activeItem.video}
+                        poster={activePoster}
+                        className="absolute inset-0 h-full w-full object-cover"
+                        playsInline
+                        muted={muted}
+                        controls={false}
+                        preload="metadata"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <video
+                    ref={videoRef}
+                    src={activeItem.video}
+                    poster={activePoster}
+                    className="absolute inset-0 h-full w-full object-cover"
+                    playsInline
+                    muted={muted}
+                    controls={false}
+                    preload="metadata"
+                  />
+                )}
 
                 <AnimatePresence>
                   {shouldShowDesktopUi && (
@@ -1055,21 +1295,25 @@ export default function SelectedProjects() {
                         exit={{ opacity: 0, x: -18 }}
                         transition={{ duration: 0.22 }}
                       >
-                        <div className="text-[11px] font-semibold tracking-[0.16em] opacity-85 sm:text-[12px]">
-                          {active.subtitle ?? "[SELECTED PROJECTS]"}
+                        <div
+                          className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-bold tracking-[0.14em] sm:text-[12px]"
+                          style={{ backgroundColor: activeCat.accent, color: "#0B0F2A" }}
+                        >
+                          <span aria-hidden="true">{activeCat.emoji}</span>
+                          {activeCat.subtitle}
                         </div>
 
                         <div className="mt-5 font-extrabold leading-[0.92] tracking-tight">
                           <div className="text-[52px] sm:text-[72px] lg:text-[84px]">
-                            {active.label.split("/")[0]?.trim()}
+                            {activeItem.title.split("/")[0]?.trim()}
                           </div>
                           <div className="text-[52px] sm:text-[72px] lg:text-[84px]">
-                            / {active.label.split("/")[1]?.trim()}
+                            / {activeItem.title.split("/")[1]?.trim()}
                           </div>
                         </div>
 
                         <div className="mt-10 max-w-[500px] space-y-7 text-[17px] leading-[1.42] opacity-100 sm:text-[20px] lg:text-[22px]">
-                          {(active.paragraphs ?? []).map((p, i) => (
+                          {activeCat.blurb.map((p, i) => (
                             <p key={i}>{p}</p>
                           ))}
                         </div>
@@ -1092,39 +1336,38 @@ export default function SelectedProjects() {
                               ? "cursor-pointer bg-white/12 hover:bg-white/18"
                               : "cursor-not-allowed bg-white/6 opacity-35",
                           ].join(" ")}
-                          aria-label="Previous thumbnails"
+                          aria-label="Previous projects"
                         >
                           <IconImg src={VIDEO_ICONS.prev} alt="Previous" size={22} />
                         </button>
 
                         <div className="flex min-w-0 flex-1 items-center justify-center gap-4 overflow-hidden">
-                          {visibleThumbs.map((project) => {
-                            const projectIndex = projects.findIndex((p) => p.id === project.id);
-                            const thumbSrc =
-                              project.thumbs?.[0] || project.poster || activePoster;
-                            const activeThumb = projectIndex === index;
+                          {visibleThumbs.map((it) => {
+                            const itIndex = items.findIndex((x) => x.id === it.id);
+                            const thumbSrc = it.poster || activePoster;
+                            const activeThumb = itIndex === itemIndex;
 
                             return (
                               <button
-                                key={project.id}
+                                key={it.id}
                                 type="button"
-                                onClick={() => goToIndex(projectIndex)}
-                                aria-label={`Open ${project.label}`}
-                                className="relative h-[118px] w-[192px] shrink-0 overflow-hidden rounded-[6px] transition-all duration-300"
+                                onClick={() => goToItem(itIndex)}
+                                aria-label={`Open ${it.title}`}
+                                className="relative h-[96px] w-[158px] shrink-0 overflow-hidden rounded-[6px] transition-all duration-300"
                                 style={{
                                   opacity: activeThumb ? 1 : 0.92,
                                   transform: activeThumb ? "scale(1.035)" : "scale(1)",
                                   boxShadow: activeThumb
-                                    ? "0 0 0 2px rgba(0,255,182,0.92), 0 0 0 6px rgba(0,255,182,0.18), 0 16px 42px rgba(0,255,182,0.20), 0 18px 36px rgba(0,0,0,0.30)"
+                                    ? `0 0 0 2px ${activeCat.accent}, 0 0 0 6px ${activeCat.accent}2e, 0 16px 42px ${activeCat.accent}33, 0 18px 36px rgba(0,0,0,0.30)`
                                     : "0 8px 24px rgba(0,0,0,0.20)",
                                   border: activeThumb
-                                    ? "1px solid rgba(0,255,182,0.95)"
+                                    ? `1px solid ${activeCat.accent}`
                                     : "1px solid rgba(255,255,255,0.12)",
                                 }}
                               >
                                 <ThumbImage
                                   src={thumbSrc}
-                                  alt={project.label}
+                                  alt={it.title}
                                   className="absolute inset-0 h-full w-full object-cover"
                                 />
 
@@ -1132,7 +1375,7 @@ export default function SelectedProjects() {
                                   className="absolute inset-0"
                                   style={{
                                     background: activeThumb
-                                      ? "linear-gradient(180deg, rgba(0,255,182,0.04) 0%, rgba(0,255,182,0.12) 100%)"
+                                      ? `linear-gradient(180deg, ${activeCat.accent}10 0%, ${activeCat.accent}1f 100%)`
                                       : "linear-gradient(180deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.28) 100%)",
                                   }}
                                 />
@@ -1161,7 +1404,7 @@ export default function SelectedProjects() {
                               ? "cursor-pointer bg-white/12 hover:bg-white/18"
                               : "cursor-not-allowed bg-white/6 opacity-35",
                           ].join(" ")}
-                          aria-label="Next thumbnails"
+                          aria-label="Next projects"
                         >
                           <IconImg src={VIDEO_ICONS.next} alt="Next" size={22} />
                         </button>
@@ -1208,8 +1451,11 @@ export default function SelectedProjects() {
                           <div className="relative flex-1">
                             <div className="relative h-[6px] rounded-full bg-white/20">
                               <div
-                                className="absolute left-0 top-0 h-[6px] rounded-full bg-white"
-                                style={{ width: `${dur > 0 ? (t / dur) * 100 : 0}%` }}
+                                className="absolute left-0 top-0 h-[6px] rounded-full"
+                                style={{
+                                  width: `${dur > 0 ? (t / dur) * 100 : 0}%`,
+                                  backgroundColor: activeCat.accent,
+                                }}
                               />
                               <input
                                 type="range"
@@ -1244,5 +1490,199 @@ export default function SelectedProjects() {
         )}
       </AnimatePresence>
     </section>
+  );
+}
+
+/* =========================
+   Gallery Fullscreen (Thumbnails / Social / Branding)
+   Shows the whole category's cards as a grid.
+========================= */
+
+function GalleryFullscreen({
+  category,
+  categories,
+  catIndex,
+  isMobile,
+  onClose,
+  onPrevCat,
+  onNextCat,
+  onSelectCategory,
+}: {
+  category: Category;
+  categories: Category[];
+  catIndex: number;
+  isMobile: boolean;
+  onClose: () => void;
+  onPrevCat: () => void;
+  onNextCat: () => void;
+  onSelectCategory: (i: number) => void;
+}) {
+  const images = category.items;
+  const ratio = category.galleryRatio ?? "16 / 9";
+  const accent = category.accent;
+
+  return (
+    <div className="absolute inset-0 overflow-hidden bg-[#06111B]">
+      {/* playful accent glow blobs */}
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute -left-[10%] top-[8%] h-[42vmin] w-[42vmin] rounded-full"
+        style={{ background: `radial-gradient(circle, ${accent}30 0%, transparent 68%)` }}
+        animate={{ x: [0, 26, 0], y: [0, -18, 0] }}
+        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-[8%] bottom-[6%] h-[38vmin] w-[38vmin] rounded-full"
+        style={{ background: `radial-gradient(circle, ${accent}24 0%, transparent 70%)` }}
+        animate={{ x: [0, -22, 0], y: [0, 16, 0] }}
+        transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      {/* header */}
+      <div className="absolute left-4 right-4 top-4 z-[240] pr-14 text-white sm:left-[42px] sm:right-[42px] sm:top-[34px] lg:left-[54px] lg:top-[38px]">
+        <div
+          className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-bold tracking-[0.14em] sm:text-[12px]"
+          style={{ backgroundColor: accent, color: "#0B0F2A" }}
+        >
+          <span aria-hidden="true">{category.emoji}</span>
+          {category.subtitle}
+        </div>
+
+        <div className="mt-3 font-extrabold leading-[0.9] tracking-tight sm:mt-5">
+          <span className="text-[30px] sm:text-[56px] lg:text-[68px]">
+            {category.label.split("/")[0]?.trim()}{" "}
+          </span>
+          <span
+            className="text-[30px] sm:text-[56px] lg:text-[68px]"
+            style={{ color: accent }}
+          >
+            / {category.label.split("/")[1]?.trim()}
+          </span>
+        </div>
+
+        <p className="mt-3 hidden max-w-[640px] text-[15px] leading-[1.5] text-white/75 sm:block">
+          {category.blurb.join(" ")}
+        </p>
+      </div>
+
+      <button
+        type="button"
+        aria-label="Close"
+        onClick={onClose}
+        className="absolute right-4 top-4 z-[250] grid h-[42px] w-[42px] cursor-pointer place-items-center rounded-full bg-black/26 backdrop-blur-sm sm:right-7 sm:top-7"
+      >
+        <IconImg src={VIDEO_ICONS.close} alt="Close" size={14} />
+      </button>
+
+      {/* grid of cards */}
+      <div
+        className={[
+          "absolute left-0 right-0 z-[220] overflow-y-auto px-4 sm:px-[42px] lg:px-[72px]",
+          isMobile ? "top-[150px] bottom-[120px]" : "top-[240px] bottom-[120px]",
+        ].join(" ")}
+        style={{ scrollbarWidth: "none" }}
+      >
+        <div
+          className="mx-auto grid w-full max-w-[1180px] gap-4 sm:gap-5"
+          style={{
+            gridTemplateColumns: isMobile
+              ? "repeat(2, minmax(0, 1fr))"
+              : "repeat(3, minmax(0, 1fr))",
+          }}
+        >
+          {images.map((it, i) => (
+            <motion.div
+              key={it.id}
+              initial={{ opacity: 0, y: 26, scale: 0.92, rotate: i % 2 === 0 ? -2 : 2 }}
+              animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
+              transition={{
+                delay: 0.06 * i,
+                type: "spring",
+                stiffness: 200,
+                damping: 20,
+              }}
+              whileHover={{ y: -6, scale: 1.025 }}
+              className="group relative overflow-hidden rounded-[12px] border border-white/10 bg-black/40"
+              style={{
+                aspectRatio: ratio,
+                boxShadow: "0 16px 38px rgba(0,0,0,0.34)",
+              }}
+            >
+              <ThumbImage
+                src={it.poster}
+                alt={it.title}
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.08]"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                style={{
+                  background: `linear-gradient(180deg, transparent 40%, ${accent}26 100%)`,
+                  boxShadow: `inset 0 0 0 2px ${accent}`,
+                }}
+              />
+              <span
+                className="absolute left-3 top-3 grid h-[26px] w-[26px] place-items-center rounded-full text-[12px] font-extrabold opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                style={{ backgroundColor: accent, color: "#0B0F2A" }}
+              >
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span className="absolute bottom-3 left-3 right-3 truncate text-[12px] font-bold tracking-wide text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                {it.title}
+              </span>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* bottom category nav */}
+      <div className="absolute bottom-0 left-0 right-0 z-[240]">
+        <div className="flex items-center justify-center gap-2 px-4 pb-[max(18px,env(safe-area-inset-bottom))] pt-4 sm:gap-3">
+          <button
+            type="button"
+            onClick={onPrevCat}
+            className="grid h-[44px] w-[44px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/10 backdrop-blur-sm transition hover:bg-white/18"
+            aria-label="Previous category"
+          >
+            <IconImg src={VIDEO_ICONS.prev} alt="Previous" size={18} />
+          </button>
+
+          <div
+            className="flex max-w-[72vw] items-center gap-2 overflow-x-auto px-1"
+            style={{ scrollbarWidth: "none" }}
+          >
+            {categories.map((c, i) => {
+              const activeChip = i === catIndex;
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => onSelectCategory(i)}
+                  className="flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-[11px] font-bold tracking-[0.04em] transition-all duration-300"
+                  style={{
+                    backgroundColor: activeChip ? c.accent : "rgba(255,255,255,0.08)",
+                    color: activeChip ? "#0B0F2A" : "rgba(255,255,255,0.78)",
+                    boxShadow: activeChip ? `0 8px 22px ${c.accent}55` : "none",
+                  }}
+                >
+                  <span aria-hidden="true">{c.emoji}</span>
+                  <span className="whitespace-nowrap">{c.label.split("/")[0]?.trim()}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <button
+            type="button"
+            onClick={onNextCat}
+            className="grid h-[44px] w-[44px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/10 backdrop-blur-sm transition hover:bg-white/18"
+            aria-label="Next category"
+          >
+            <IconImg src={VIDEO_ICONS.next} alt="Next" size={18} />
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

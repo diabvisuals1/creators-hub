@@ -16,7 +16,7 @@ export default function AboutUs() {
       />
 
       <div className="relative z-[1] mx-auto w-full max-w-[1180px] px-4 sm:px-6 lg:px-0">
-        <div className="min-h-[694px] pt-[28px] pb-[40px] lg:h-[694px] lg:pt-[34px] lg:pb-0">
+        <div className="min-h-[694px] pt-[28px] pb-[40px] lg:min-h-[694px] lg:pt-[34px] lg:pb-0">
           {/* Title */}
           <h2
             className="
@@ -34,11 +34,11 @@ export default function AboutUs() {
           <div
             className="
               grid w-full grid-cols-1 gap-[18px]
-              lg:h-[507px] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.28fr)] lg:gap-[26px]
+              lg:min-h-[507px] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.28fr)] lg:gap-[26px]
             "
           >
             {/* Left side */}
-            <div className="flex w-full flex-col gap-[18px] lg:h-full">
+            <div className="flex w-full flex-col gap-[18px]">
               {/* Blue card */}
               <div
                 className="
@@ -48,7 +48,6 @@ export default function AboutUs() {
                   px-[24px] pt-[18px] pb-[20px]
                   transition-all duration-300 ease-out
                   hover:-translate-y-[4px]
-                  lg:min-h-0 lg:flex-1
                 "
               >
                 <div className="flex items-start justify-between">
@@ -86,47 +85,47 @@ export default function AboutUs() {
                 className="
                   relative w-full overflow-hidden rounded-[10px]
                   border border-[#AEB4CC] bg-white
+                  flex items-center
                   min-h-[239px]
                   px-[18px] py-[22px]
                   transition-all duration-300 ease-out
                   hover:-translate-y-[4px]
-                  lg:min-h-0 lg:flex-1
                 "
               >
-                <div className="grid h-full grid-cols-2 grid-rows-2 place-items-center gap-y-[8px]">
+                <div className="grid w-full grid-cols-2 place-items-center gap-x-[14px] gap-y-[20px]">
                   <div className="text-center">
-                    <h3 className="text-[34px] font-extrabold leading-none text-[#31388C] sm:text-[38px]">
-                      10k+
+                    <h3 className="text-[26px] font-extrabold leading-[1.1] text-[#31388C] sm:text-[30px] lg:text-[26px] text-balance">
+                      6+
                     </h3>
                     <p className="mt-[10px] text-[14px] font-semibold leading-[1.2] text-[#31388C] sm:text-[15px]">
-                      Completed Projects
+                      Years of Experience
                     </p>
                   </div>
 
                   <div className="text-center">
-                    <h3 className="text-[34px] font-extrabold leading-none text-[#31388C] sm:text-[38px]">
-                      15k
+                    <h3 className="text-[26px] font-extrabold leading-[1.1] text-[#31388C] sm:text-[30px] lg:text-[26px] text-balance">
+                      Video + Design
                     </h3>
                     <p className="mt-[10px] text-[14px] font-semibold leading-[1.2] text-[#31388C] sm:text-[15px]">
-                      Satisfied Customers
+                      Creative Production
                     </p>
                   </div>
 
                   <div className="text-center">
-                    <h3 className="text-[34px] font-extrabold leading-none text-[#31388C] sm:text-[38px]">
-                      10k+
+                    <h3 className="text-[26px] font-extrabold leading-[1.1] text-[#31388C] sm:text-[30px] lg:text-[26px] text-balance">
+                      Worldwide
                     </h3>
                     <p className="mt-[10px] text-[14px] font-semibold leading-[1.2] text-[#31388C] sm:text-[15px]">
-                      Years Of Mastery
+                      Remote Delivery
                     </p>
                   </div>
 
                   <div className="text-center">
-                    <h3 className="text-[34px] font-extrabold leading-none text-[#31388C] sm:text-[38px]">
-                      45+
+                    <h3 className="text-[26px] font-extrabold leading-[1.1] text-[#31388C] sm:text-[30px] lg:text-[26px] text-balance">
+                      Creators / Brands / Events
                     </h3>
                     <p className="mt-[10px] text-[14px] font-semibold leading-[1.2] text-[#31388C] sm:text-[15px]">
-                      Worldwide Honors
+                      Who We Support
                     </p>
                   </div>
                 </div>

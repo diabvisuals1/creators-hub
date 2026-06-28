@@ -60,24 +60,23 @@ export default function Footer() {
 
             <div className="mt-[35px] flex flex-col gap-[8px] max-[767px]:mt-[14px]">
               <ActionButton
-                href="mailto:hello@creatorshub.com"
+                href="mailto:creators.hub.agencyy@gmail.com"
                 bg="#E63A3A"
-                ariaLabel="Email"
-                iconSrc="/footer/mail.svg"
+                label="Email Us"
+                value="creators.hub.agencyy@gmail.com"
               />
               <ActionButton
-                href="https://wa.me/201000000000"
+                href="https://wa.me/201105494439"
                 bg="#1DB954"
-                ariaLabel="WhatsApp"
-                iconSrc="/footer/mail.svg"
+                label="WhatsApp"
+                value="+201105494439"
                 target="_blank"
                 rel="noreferrer"
               />
               <ActionButton
-                href="tel:+201000000000"
+                href="#contact"
                 bg="#141B4D"
-                ariaLabel="Phone"
-                iconSrc="/footer/mail.svg"
+                label="Start a Project"
               />
             </div>
           </div>
@@ -94,8 +93,8 @@ export default function Footer() {
           >
             <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between max-[767px]:items-center max-[767px]:text-center">
               <p className="max-w-[520px] text-[24px] leading-[1.18] text-white max-[767px]:text-[20px]">
-                We are engineering high-impact <br className="hidden sm:block max-[767px]:hidden" />
-                content for world’s leading brands
+                We craft content that helps creators, <br className="hidden sm:block max-[767px]:hidden" />
+                brands, and events stand out.
               </p>
 
               <div className="flex items-start gap-10 lg:gap-14 max-[767px]:flex-col max-[767px]:items-center max-[767px]:gap-8">
@@ -134,7 +133,7 @@ export default function Footer() {
                           href="#testimonials"
                           className="text-white transition-opacity duration-200 hover:opacity-75 focus:opacity-75 focus:outline-none"
                         >
-                          Testimonials
+                          Why Us
                         </a>
                       </li>
                     </ul>
@@ -145,7 +144,7 @@ export default function Footer() {
                     <ul className="mt-4 space-y-2 text-[12px]">
                       <li>
                         <a
-                          href="mailto:hello@creatorshub.com"
+                          href="mailto:creators.hub.agencyy@gmail.com"
                           className="text-white transition-opacity duration-200 hover:opacity-75 focus:opacity-75 focus:outline-none"
                         >
                           Email
@@ -153,7 +152,7 @@ export default function Footer() {
                       </li>
                       <li>
                         <a
-                          href="https://wa.me/201000000000"
+                          href="https://wa.me/201105494439"
                           target="_blank"
                           rel="noreferrer"
                           className="text-white transition-opacity duration-200 hover:opacity-75 focus:opacity-75 focus:outline-none"
@@ -163,7 +162,7 @@ export default function Footer() {
                       </li>
                       <li>
                         <a
-                          href="tel:+201000000000"
+                          href="tel:+201105494439"
                           className="text-white transition-opacity duration-200 hover:opacity-75 focus:opacity-75 focus:outline-none"
                         >
                           Phone Number
@@ -223,15 +222,15 @@ export default function Footer() {
 
 function ActionButton({
   bg,
-  ariaLabel,
-  iconSrc,
+  label,
+  value,
   href,
   target,
   rel,
 }: {
   bg: string;
-  ariaLabel: string;
-  iconSrc: string;
+  label: string;
+  value?: string;
   href: string;
   target?: string;
   rel?: string;
@@ -239,18 +238,24 @@ function ActionButton({
   return (
     <a
       href={href}
-      aria-label={ariaLabel}
+      aria-label={value ? `${label}: ${value}` : label}
       target={target}
       rel={rel}
-      className="flex w-full items-center justify-center rounded-[8px] h-[60px]"
+      className="flex h-[60px] w-full flex-col items-center justify-center gap-[2px] rounded-[8px] px-3 text-center leading-none text-white transition-opacity duration-200 hover:opacity-90"
       style={{ backgroundColor: bg }}
     >
-      <img
-        src={iconSrc}
-        alt=""
-        draggable={false}
-        className="h-[24px] w-[24px] select-none pointer-events-none object-contain"
-      />
+      {value ? (
+        <>
+          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] opacity-80">
+            {label}
+          </span>
+          <span className="max-w-full truncate text-[13px] font-semibold">
+            {value}
+          </span>
+        </>
+      ) : (
+        <span className="text-[14px] font-semibold">{label}</span>
+      )}
     </a>
   );
 }

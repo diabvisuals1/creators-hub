@@ -12,6 +12,7 @@ const RED = "#FF1E1E";
 type FormState = {
   name: string;
   email: string;
+  service: string;
   message: string;
 };
 
@@ -54,6 +55,7 @@ export default function ContactUs() {
   const [form, setForm] = useState<FormState>({
     name: "",
     email: "",
+    service: "",
     message: "",
   });
 
@@ -84,10 +86,11 @@ export default function ContactUs() {
     const payload = {
       name: form.name.trim(),
       email: form.email.trim(),
+      service: form.service.trim(),
       message: form.message.trim(),
     };
 
-    if (!payload.name || !payload.email || !payload.message) {
+    if (!payload.name || !payload.email || !payload.service || !payload.message) {
       setStatus({
         type: "error",
         message: "Please fill in all required fields.",
@@ -127,6 +130,7 @@ export default function ContactUs() {
         {
           name: payload.name,
           email: payload.email,
+          service: payload.service,
           message: payload.message,
         },
         emailJsConfig.publicKey
@@ -144,6 +148,7 @@ export default function ContactUs() {
       setForm({
         name: "",
         email: "",
+        service: "",
         message: "",
       });
     } catch (error: unknown) {
@@ -166,7 +171,7 @@ export default function ContactUs() {
     >
       <div className="w-full px-4 sm:px-6">
         <div className="mx-auto w-full max-w-[1240px]">
-          <div className="grid w-full lg:h-[680px] lg:grid-cols-2">
+          <div className="grid w-full lg:min-h-[680px] lg:grid-cols-2">
             <div className="relative h-[420px] sm:h-[520px] lg:h-full">
               <img
                 src="/contact/contact-photo.png"
@@ -189,16 +194,17 @@ export default function ContactUs() {
               </div>
             </div>
 
-            <div className="relative h-full overflow-hidden">
+            <div className="relative h-full">
               <div className="relative z-10 h-full">
                 <div
                   className="w-full px-6 py-10 sm:px-10 sm:py-12 lg:px-12 lg:py-0"
                   style={{
-                    height: "100%",
+                    minHeight: "100%",
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "flex-start",
                     paddingTop: "clamp(48px, 7.5vh, 86px)",
+                    paddingBottom: "clamp(32px, 5vh, 64px)",
                     paddingLeft: "clamp(24px, 2.2vw, 44px)",
                   }}
                 >
@@ -223,6 +229,13 @@ export default function ContactUs() {
                       value={form.email}
                       onChange={(v) => onChange("email", v)}
                       type="email"
+                    />
+
+                    <Field
+                      label="Service Needed*"
+                      placeholder="Video Editing, Design, Social Media...."
+                      value={form.service}
+                      onChange={(v) => onChange("service", v)}
                     />
 
                     <Field
@@ -293,8 +306,6 @@ export default function ContactUs() {
                       </motion.button>
                     </div>
                   </form>
-
-                  <div className="h-[42px]" />
                 </div>
               </div>
             </div>
