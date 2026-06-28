@@ -2,20 +2,26 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useAnimationFrame, useMotionValue } from "framer-motion";
+import {
+  SquarePlay,
+  Monitor,
+  User,
+  Zap,
+  Puzzle,
+  type LucideIcon,
+} from "lucide-react";
 
-type TestimonialCard = {
+type WhyCard = {
   id: string;
-  rating: string;
-  quote: string;
-  brand: string;
+  Icon: LucideIcon;
+  title: string;
+  desc: string;
 };
 
 const BRAND_NAVY = "#151A43";
 const RED = "#FF1E1E";
 const CARD_BLUE = "#4186FF";
 const SECTION_BG = "/testimonials/background.png";
-const STAR_ASSET = "/testimonials/star.svg";
-const MR_BEAST_LOGO = "/testimonials/mr-beast-logo.svg";
 
 function cardFloatSpec(idx: number) {
   return {
@@ -26,35 +32,37 @@ function cardFloatSpec(idx: number) {
 }
 
 export default function Testimonials() {
-  const items: TestimonialCard[] = useMemo(
+  const items: WhyCard[] = useMemo(
     () => [
       {
         id: "card-01",
-        rating: "5.0",
-        brand: "Mr Beast",
-        quote:
-          "I've worked with agencies before, but no one understands the 'Launch' phase like these guys. We spent weeks building the roadmap together, and their attention to detail on the visuals was incredible—it finally felt like my brand looked as professional as the content I was producing.",
+        Icon: SquarePlay,
+        title: "Video & Design Under One Roof",
+        desc: "We handle videos, thumbnails, social media visuals, and motion graphics in one creative workflow.",
       },
       {
         id: "card-02",
-        rating: "5.0",
-        brand: "Mr Beast",
-        quote:
-          "Before working with the team, I was drowning in the day-to-day. I had the ideas, but no clear roadmap to execute them. They didn't just give me advice; they took over the entire lifecycle of my brand. From the moment they redesigned my visual identity to the day we managed the launch of my latest series, the quality shift was night and day.",
+        Icon: Monitor,
+        title: "Platform-Ready Content",
+        desc: "Every piece of content is prepared for the platform it will live on, from YouTube to Reels, TikTok, and event screens.",
       },
       {
         id: "card-03",
-        rating: "5.0",
-        brand: "Mr Beast",
-        quote:
-          "Most people in this industry handle one piece of the puzzle, but what sets this team apart is that they owned the entire lifecycle.",
+        Icon: User,
+        title: "Beginner-Friendly Support",
+        desc: "Whether you are just starting or already growing, we can help you shape your content, improve your visuals, and build a cleaner online presence.",
       },
       {
         id: "card-04",
-        rating: "5.0",
-        brand: "Mr Beast",
-        quote:
-          "What really impressed me was how they were able to handle every moving part without losing quality or momentum throughout the process.",
+        Icon: Zap,
+        title: "Fast, Clear Workflow",
+        desc: "We work from brief to delivery with clear communication, revisions, and organized production.",
+      },
+      {
+        id: "card-05",
+        Icon: Puzzle,
+        title: "Flexible Creative Support",
+        desc: "Whether you need one edit, monthly content, branding, or full social media management, we can support your production needs.",
       },
     ],
     []
@@ -133,7 +141,7 @@ export default function Testimonials() {
             className="text-[11px] font-semibold tracking-[0.22em] sm:text-[12px]"
             style={{ color: BRAND_NAVY, opacity: 0.72 }}
           >
-            ( TESTIMONIALS )
+            ( WHY WORK WITH US )
           </div>
 
           <h2
@@ -141,10 +149,10 @@ export default function Testimonials() {
             className="mt-3 text-[30px] font-extrabold leading-[0.95] tracking-tight sm:text-[42px] lg:text-[56px]"
             style={{ color: BRAND_NAVY }}
           >
-            DON&apos;T TAKE OUR WORD FOR IT
+            Why Work With Creators Hub
           </h2>
 
-          <div className="mt-5 flex items-center justify-center gap-8 sm:gap-10">
+          <div className="mt-5 flex items-center justify-center gap-6 sm:gap-8">
             <span
               className="text-[11px] font-extrabold tracking-[0.28em] sm:text-[12px]"
               style={{ color: RED }}
@@ -152,10 +160,10 @@ export default function Testimonials() {
               •
             </span>
             <span
-              className="text-[11px] font-extrabold tracking-[0.34em] sm:text-[12px]"
+              className="text-[11px] font-extrabold tracking-[0.18em] sm:text-[12px]"
               style={{ color: RED }}
             >
-              TAKE THEIRS
+              Built for reliable creative delivery
             </span>
             <span
               className="text-[11px] font-extrabold tracking-[0.28em] sm:text-[12px]"
@@ -184,17 +192,13 @@ export default function Testimonials() {
               className="flex items-start gap-4 px-3 pt-6 pb-16 sm:gap-5 sm:px-4 sm:pt-8 sm:pb-20 lg:gap-7 lg:px-5 lg:pt-10 lg:pb-24"
             >
               {items.map((card, idx) => (
-                <TestimonialCardItem
-                  key={`${card.id}-set1`}
-                  card={card}
-                  idx={idx}
-                />
+                <WhyCardItem key={`${card.id}-set1`} card={card} idx={idx} />
               ))}
             </div>
 
             <div className="flex items-start gap-4 px-3 pt-6 pb-16 sm:gap-5 sm:px-4 sm:pt-8 sm:pb-20 lg:gap-7 lg:px-5 lg:pt-10 lg:pb-24">
               {items.map((card, idx) => (
-                <TestimonialCardItem
+                <WhyCardItem
                   key={`${card.id}-set2`}
                   card={card}
                   idx={idx + items.length}
@@ -204,7 +208,7 @@ export default function Testimonials() {
 
             <div className="flex items-start gap-4 px-3 pt-6 pb-16 sm:gap-5 sm:px-4 sm:pt-8 sm:pb-20 lg:gap-7 lg:px-5 lg:pt-10 lg:pb-24">
               {items.map((card, idx) => (
-                <TestimonialCardItem
+                <WhyCardItem
                   key={`${card.id}-set3`}
                   card={card}
                   idx={idx + items.length * 2}
@@ -218,22 +222,16 @@ export default function Testimonials() {
   );
 }
 
-function TestimonialCardItem({
-  card,
-  idx,
-}: {
-  card: TestimonialCard;
-  idx: number;
-}) {
+function WhyCardItem({ card, idx }: { card: WhyCard; idx: number }) {
   const floatSpec = cardFloatSpec(idx);
+  const Icon = card.Icon;
 
   return (
     <motion.article
-      itemScope
-      itemType="https://schema.org/Review"
       className="
-        relative shrink-0 overflow-hidden rounded-[14px]
-        w-[290px] sm:w-[350px] lg:w-[425px]
+        relative shrink-0 overflow-hidden rounded-[22px]
+        w-[280px] sm:w-[300px] lg:w-[330px]
+        min-h-[340px] lg:min-h-[400px]
       "
       style={{
         background: `linear-gradient(135deg, ${CARD_BLUE} 0%, ${CARD_BLUE} 76%, rgba(159,242,232,0.95) 100%)`,
@@ -263,79 +261,37 @@ function TestimonialCardItem({
       <div
         className="
           flex h-full w-full flex-col
-          p-[24px] sm:p-[30px] lg:p-[38px]
+          p-[26px] sm:p-[30px] lg:p-[34px]
         "
       >
-        <div className="flex items-center gap-[10px]">
-          <span
-            className="leading-none text-white text-[18px] sm:text-[24px] lg:text-[32px]"
-            style={{
-              fontFamily: "Kollektif, sans-serif",
-              fontWeight: 400,
-            }}
-            aria-label={`${card.rating} out of 5`}
-          >
-            {card.rating}
-          </span>
-
-          <div
-            className="flex items-center gap-[6px]"
-            aria-label="5 out of 5 stars"
-            itemProp="reviewRating"
-            itemScope
-            itemType="https://schema.org/Rating"
-          >
-            <meta itemProp="ratingValue" content="5" />
-            <meta itemProp="bestRating" content="5" />
-
-            {Array.from({ length: 5 }).map((_, starIdx) => (
-              <img
-                key={starIdx}
-                src={STAR_ASSET}
-                alt=""
-                aria-hidden="true"
-                draggable={false}
-                loading="lazy"
-                className="h-[12px] w-[12px] object-contain sm:h-[14px] sm:w-[14px] lg:h-[17px] lg:w-[17px]"
-              />
-            ))}
-          </div>
+        <div
+          className="
+            flex items-center justify-center
+            h-[52px] w-[52px] rounded-full
+            bg-white/15
+          "
+        >
+          <Icon className="h-[26px] w-[26px] text-white" strokeWidth={2} />
         </div>
+
+        <h3
+          className="mt-[26px] text-[20px] font-bold leading-[1.2] text-white lg:text-[22px]"
+          style={{ fontFamily: "Kollektif, sans-serif" }}
+        >
+          {card.title}
+        </h3>
 
         <div
           aria-hidden="true"
-          className="mt-[22px] h-px w-full bg-white/35 lg:mt-[28px]"
+          className="mt-[16px] h-px w-full bg-white/30 lg:mt-[20px]"
         />
 
-        <blockquote
-          className="mt-[22px] text-white lg:mt-[28px]"
-          style={{
-            fontFamily: "Kollektif, sans-serif",
-            fontWeight: 400,
-            fontSize: "20px",
-            lineHeight: "1.68",
-          }}
+        <p
+          className="mt-[16px] text-[15px] leading-[1.65] text-white/90 lg:mt-[20px] lg:text-[16px]"
+          style={{ fontFamily: "Kollektif, sans-serif" }}
         >
-          <p
-            itemProp="reviewBody"
-            className="text-[15px] leading-[1.7] sm:text-[17px] lg:text-[20px]"
-          >
-            &ldquo;{card.quote}&rdquo;
-          </p>
-        </blockquote>
-
-        <div className="mt-auto pt-[22px] lg:pt-[26px]">
-          <img
-            src={MR_BEAST_LOGO}
-            alt={`${card.brand} logo`}
-            draggable={false}
-            loading="lazy"
-            className="h-[26px] w-auto object-contain sm:h-[32px] lg:h-[38px]"
-          />
-        </div>
-
-        <meta itemProp="author" content={card.brand} />
-        <meta itemProp="itemReviewed" content={card.brand} />
+          {card.desc}
+        </p>
       </div>
     </motion.article>
   );

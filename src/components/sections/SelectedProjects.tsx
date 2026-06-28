@@ -120,7 +120,14 @@ const VIDEO_ICONS = {
   next: "/video-icons/next.svg",
 };
 
-const T = (n: number) => `/projects/thumbs/t${n}.jpg`;
+/**
+ * Asset paths per category. Drop files into:
+ *   public/projects/<category>/<n>.jpg   → poster / gallery image
+ *   public/projects/<category>/<n>.mp4   → video (video & vertical categories only)
+ * Categories: long-form | shorts | event | social | thumbnails | branding
+ */
+const POSTER = (cat: string, n: number) => `/projects/${cat}/${n}.jpg`;
+const VIDEO = (cat: string, n: number) => `/projects/${cat}/${n}.mp4`;
 
 function clamp(n: number, a: number, b: number) {
   return Math.max(a, Math.min(b, n));
@@ -223,12 +230,11 @@ export default function SelectedProjects() {
           "From raw footage to a final export tuned for the platform, every cut is built to keep viewers watching.",
         ],
         items: [
-          { id: "lf1", title: "EP. 01 / ISLAND CHALLENGE", poster: T(1), video: "/projects/p3.mp4" },
-          { id: "lf2", title: "EP. 02 / 24H SURVIVAL", poster: T(2), video: "/projects/p4.mp4" },
-          { id: "lf3", title: "EP. 03 / $1 VS $1M", poster: T(3), video: "/projects/p5.mp4" },
-          { id: "lf4", title: "EP. 04 / WORLD TOUR", poster: T(4), video: "/projects/p2.mp4" },
-          { id: "lf5", title: "EP. 05 / MEGA BUILD", poster: T(5), video: "/projects/kai.mp4" },
-          { id: "lf6", title: "EP. 06 / FINAL ROUND", poster: T(6), video: "/projects/p3.mp4" },
+          { id: "lf1", title: "CLIQUE / TEAM VIDEO", poster: POSTER("long-form", 1), video: VIDEO("long-form", 1) },
+          { id: "lf2", title: "FC TOURNAMENT / PROMO", poster: POSTER("long-form", 2), video: VIDEO("long-form", 2) },
+          { id: "lf3", title: "GAMAX / FEMALE TEAM", poster: POSTER("long-form", 3), video: VIDEO("long-form", 3) },
+          { id: "lf4", title: "TSE / ANNOUNCEMENT", poster: POSTER("long-form", 4), video: VIDEO("long-form", 4) },
+          { id: "lf5", title: "ALFILKAWY / AL QAQAA", poster: POSTER("long-form", 5), video: VIDEO("long-form", 5) },
         ],
       },
       {
@@ -245,12 +251,12 @@ export default function SelectedProjects() {
           "Built for the first three seconds, so the scroll stops and the replay starts.",
         ],
         items: [
-          { id: "sh1", title: "REEL / HOOK 01", poster: T(5), video: "/projects/p2.mp4" },
-          { id: "sh2", title: "REEL / VIRAL CUT", poster: T(4), video: "/projects/kai.mp4" },
-          { id: "sh3", title: "SHORT / POV", poster: T(6), video: "/projects/p2.mp4" },
-          { id: "sh4", title: "REEL / TREND 02", poster: T(1), video: "/projects/kai.mp4" },
-          { id: "sh5", title: "SHORT / CHALLENGE", poster: T(2), video: "/projects/p2.mp4" },
-          { id: "sh6", title: "REEL / TEASER", poster: T(3), video: "/projects/kai.mp4" },
+          { id: "sh1", title: "NASR ESPORTS / VALORANT", poster: POSTER("shorts", 1), video: VIDEO("shorts", 1) },
+          { id: "sh2", title: "THE BASE / EVENT", poster: POSTER("shorts", 2), video: VIDEO("shorts", 2) },
+          { id: "sh3", title: "REEDY / SPORTING CLUB", poster: POSTER("shorts", 3), video: VIDEO("shorts", 3) },
+          { id: "sh4", title: "THE BASE / ABOADAM", poster: POSTER("shorts", 4), video: VIDEO("shorts", 4) },
+          { id: "sh5", title: "SHORTS / PAJILL", poster: POSTER("shorts", 5), video: VIDEO("shorts", 5) },
+          { id: "sh6", title: "THE BASE / MAGIC SHOW", poster: POSTER("shorts", 6), video: VIDEO("shorts", 6) },
         ],
       },
       {
@@ -267,12 +273,10 @@ export default function SelectedProjects() {
           "Plus sponsor and partner visuals that keep the whole production looking sharp and on-brand.",
         ],
         items: [
-          { id: "ev1", title: "EVENT / AFTERMOVIE", poster: T(4), video: "/projects/p4.mp4" },
-          { id: "ev2", title: "EVENT / PROMO", poster: T(6), video: "/projects/p5.mp4" },
-          { id: "ev3", title: "EVENT / RECAP", poster: T(2), video: "/projects/p3.mp4" },
-          { id: "ev4", title: "STAGE / VISUALS", poster: T(1), video: "/projects/p4.mp4" },
-          { id: "ev5", title: "EVENT / TEASER", poster: T(3), video: "/projects/p5.mp4" },
-          { id: "ev6", title: "EVENT / HIGHLIGHTS", poster: T(5), video: "/projects/p3.mp4" },
+          { id: "ev1", title: "FC TOURNAMENT / STAGE SCREEN", poster: POSTER("event", 1), video: VIDEO("event", 1) },
+          { id: "ev2", title: "FC TOURNAMENT / MOTION", poster: POSTER("event", 2), video: VIDEO("event", 2) },
+          { id: "ev3", title: "GAMAX / EWC EVENT", poster: POSTER("event", 3), video: VIDEO("event", 3) },
+          { id: "ev4", title: "FC TOURNAMENT / SCREEN ANIM", poster: POSTER("event", 4), video: VIDEO("event", 4) },
         ],
       },
       {
@@ -290,12 +294,12 @@ export default function SelectedProjects() {
         ],
         galleryRatio: "4 / 5",
         items: [
-          { id: "so1", title: "FEED / POST 01", poster: T(1) },
-          { id: "so2", title: "STORY / SET 01", poster: T(2) },
-          { id: "so3", title: "REEL / COVER", poster: T(3) },
-          { id: "so4", title: "FEED / POST 02", poster: T(4) },
-          { id: "so5", title: "STORY / SET 02", poster: T(5) },
-          { id: "so6", title: "CAROUSEL / 01", poster: T(6) },
+          { id: "so1", title: "CLIQUE / VCT EMEA", poster: POSTER("social", 1) },
+          { id: "so2", title: "GAMAX / EWC POST", poster: POSTER("social", 2) },
+          { id: "so3", title: "THE BASE / NEJM", poster: POSTER("social", 3) },
+          { id: "so4", title: "CLIQUE / UPCOMING EVENTS", poster: POSTER("social", 4) },
+          { id: "so5", title: "SANGOVI / WE'RE BACK", poster: POSTER("social", 5) },
+          { id: "so6", title: "REEDY / POST", poster: POSTER("social", 6) },
         ],
       },
       {
@@ -313,12 +317,11 @@ export default function SelectedProjects() {
         ],
         galleryRatio: "16 / 9",
         items: [
-          { id: "th1", title: "THUMB / 01", poster: T(3) },
-          { id: "th2", title: "THUMB / 02", poster: T(1) },
-          { id: "th3", title: "THUMB / 03", poster: T(2) },
-          { id: "th4", title: "THUMB / 04", poster: T(4) },
-          { id: "th5", title: "THUMB / 05", poster: T(5) },
-          { id: "th6", title: "THUMB / 06", poster: T(6) },
+          { id: "th1", title: "SANGOVI / THUMBNAIL", poster: POSTER("thumbnails", 1) },
+          { id: "th2", title: "ALFILKAWY / MAD LOVER", poster: POSTER("thumbnails", 2) },
+          { id: "th3", title: "ALFILKAWY / AL QAQAA", poster: POSTER("thumbnails", 3) },
+          { id: "th4", title: "SANGOVI / THUMBNAIL 02", poster: POSTER("thumbnails", 4) },
+          { id: "th5", title: "ALFILKAWY / INMATES", poster: POSTER("thumbnails", 5) },
         ],
       },
       {
@@ -336,12 +339,12 @@ export default function SelectedProjects() {
         ],
         galleryRatio: "4 / 3",
         items: [
-          { id: "br1", title: "LOGO / SYSTEM", poster: T(6) },
-          { id: "br2", title: "BRAND / GUIDE", poster: T(5) },
-          { id: "br3", title: "COLOR / PALETTE", poster: T(4) },
-          { id: "br4", title: "TYPE / SYSTEM", poster: T(3) },
-          { id: "br5", title: "BRAND / KIT", poster: T(2) },
-          { id: "br6", title: "IDENTITY / 01", poster: T(1) },
+          { id: "br1", title: "CLIQUE / APEX LEGENDS", poster: POSTER("branding", 1) },
+          { id: "br2", title: "SANGOVI / IDENTITY", poster: POSTER("branding", 2) },
+          { id: "br3", title: "GAMAX / LOGO & BANNER", poster: POSTER("branding", 3) },
+          { id: "br4", title: "TSE / DESIGN", poster: POSTER("branding", 4) },
+          { id: "br5", title: "CLIQUE / CHAMPION", poster: POSTER("branding", 5) },
+          { id: "br6", title: "LOVERS ROCK / DESIGN", poster: POSTER("branding", 6) },
         ],
       },
     ],
