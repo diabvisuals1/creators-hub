@@ -60,10 +60,10 @@ function useTypeLoop(words: string[]) {
 }
 
 const companyLogos = [
-  { name: "Sangovi", src: "/hero/logos/sangovi.png", h: 68 },
-  { name: "Gamax", src: "/hero/logos/gamax.png", h: 62 },
+  { name: "Sangovi", src: "/hero/logos/sangovi.png", h: 80 },
+  { name: "Gamax", src: "/hero/logos/gamax.png", h: 80 },
   { name: "Reedy Sports Club", src: "/hero/logos/reedy.png", h: 80 },
-  { name: "EWC", src: "/hero/logos/ewc.png", h: 40 },
+  { name: "EWC", src: "/hero/logos/ewc.png", h: 80 },
 ];
 
 function HeroLogosBar() {
