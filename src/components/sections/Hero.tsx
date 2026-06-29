@@ -60,10 +60,10 @@ function useTypeLoop(words: string[]) {
 }
 
 const companyLogos = [
-  { name: "Sangovi", src: "/hero/logos/sangovi.png", h: 80 },
-  { name: "Gamax", src: "/hero/logos/gamax.png", h: 80 },
-  { name: "Reedy Sports Club", src: "/hero/logos/reedy.png", h: 80 },
-  { name: "EWC", src: "/hero/logos/ewc.png", h: 80 },
+  { name: "Sangovi", src: "/hero/logos/sangovi.png" },
+  { name: "Gamax", src: "/hero/logos/gamax.png" },
+  { name: "Reedy Sports Club", src: "/hero/logos/reedy.png" },
+  { name: "EWC", src: "/hero/logos/ewc.png" },
 ];
 
 function HeroLogosBar() {
@@ -95,16 +95,15 @@ function HeroLogosBar() {
                 ease: "easeOut",
               }}
               whileHover={{ y: -3 }}
-              className="group flex cursor-default items-center justify-center"
+              className="group flex h-[62px] w-[150px] cursor-default items-center justify-center"
               aria-label={logo.name}
             >
               <img
                 src={logo.src}
                 alt={logo.name}
                 draggable={false}
-                style={{ height: logo.h, width: "auto" }}
                 className="
-                  select-none object-contain
+                  max-h-full max-w-full select-none object-contain
                   opacity-60 grayscale
                   transition-all duration-500 ease-out
                   group-hover:scale-[1.05] group-hover:opacity-100 group-hover:grayscale-0
