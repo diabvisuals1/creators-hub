@@ -1,4 +1,5 @@
 import Hero from "@/components/sections/Hero";
+import Reveal from "@/components/Reveal";
 import SiteIntro from "@/components/sections/SiteIntro";
 import WayWeWork from "@/components/sections/WayWeWork";
 import SelectedProjects from "@/components/sections/SelectedProjects";
@@ -11,12 +12,24 @@ export default function Home() {
   return (
     <SiteIntro>
       <Hero />
-      <WayWeWork />
-      <SelectedProjects />
-      <Testimonials />
-      <ContactUs />
-      <AboutUs />
-      <Footer />
+      <Reveal>
+        <WayWeWork />
+      </Reveal>
+      <Reveal>
+        <SelectedProjects />
+      </Reveal>
+      <Reveal>
+        <Testimonials />
+      </Reveal>
+      <Reveal>
+        <ContactUs />
+      </Reveal>
+      <Reveal>
+        <AboutUs />
+      </Reveal>
+      <Reveal>
+        <Footer />
+      </Reveal>
     </SiteIntro>
   );
 }

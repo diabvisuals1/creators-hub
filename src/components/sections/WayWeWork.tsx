@@ -95,7 +95,7 @@ function WayWeWork() {
               strength={120}
               dragBoundsRef={dragBoundsRef}
               label="BRIEF & DIRECTION"
-              className="left-[34%] top-[16%] sm:left-[25%] sm:top-[20%]"
+              className="left-[20%] top-[14%] sm:left-[15%] sm:top-[15%]"
               trail="left"
               pillClass="bg-white text-[#B7AE00]"
               trailClass="bg-[#C9D240]/45"
@@ -105,7 +105,7 @@ function WayWeWork() {
               strength={140}
               dragBoundsRef={dragBoundsRef}
               label="EDITING & DESIGN"
-              className="left-[74%] top-[10%] sm:left-[84%] sm:top-[16%]"
+              className="left-[78%] top-[12%] sm:left-[83%] sm:top-[14%]"
               trail="right"
               pillClass="bg-[#151B3A] text-white"
               trailClass="bg-[#D8D8DD]/55"
@@ -115,7 +115,7 @@ function WayWeWork() {
               strength={150}
               dragBoundsRef={dragBoundsRef}
               label="REVIEW & REFINEMENT"
-              className="left-[72%] top-[24%] sm:left-[58%] sm:top-[30%]"
+              className="left-[50%] top-[26%] sm:left-[50%] sm:top-[9%]"
               trail="right"
               pillClass="bg-[#3F7BFF] text-white"
               trailClass="bg-[#AFC6FF]/45"
@@ -125,7 +125,7 @@ function WayWeWork() {
               strength={110}
               dragBoundsRef={dragBoundsRef}
               label="PLATFORM-READY DELIVERY"
-              className="left-1/2 top-[55%] sm:left-[46%] sm:top-[54%]"
+              className="left-[28%] top-[74%] sm:left-[27%] sm:top-[76%]"
               trail="left"
               pillClass="bg-[#10E6C6] text-[#08352F]"
               trailClass="bg-[#10E6C6]/22"
@@ -135,7 +135,7 @@ function WayWeWork() {
               strength={150}
               dragBoundsRef={dragBoundsRef}
               label="CREATIVE CONSISTENCY"
-              className="left-[30%] top-[72%] sm:left-[16%] sm:top-[68%]"
+              className="left-[72%] top-[80%] sm:left-[73%] sm:top-[78%]"
               trail="left"
               pillClass="bg-[#151B3A] text-white"
               trailClass="bg-[#151B3A]/30"
@@ -334,6 +334,33 @@ function HowWeHelp({ className = "" }: HowWeHelpProps) {
   const activeIndex = useMemo(() => tabs.findIndex((t) => t.id === activeId), [tabs, activeId]);
   const activeTab = tabs[activeIndex] ?? tabs[0];
 
+  // mobile swipe between cards
+  const [swipeDir, setSwipeDir] = useState<1 | -1>(1);
+  const swipeStartX = useRef<number | null>(null);
+
+  const goTab = (dir: 1 | -1) => {
+    setSwipeDir(dir);
+    setActiveId(tabs[(activeIndex + dir + tabs.length) % tabs.length].id);
+  };
+
+  const goToTab = (i: number) => {
+    if (i === activeIndex) return;
+    setSwipeDir(i > activeIndex ? 1 : -1);
+    setActiveId(tabs[i].id);
+  };
+
+  const onSwipeDown = (e: React.PointerEvent) => {
+    swipeStartX.current = e.clientX;
+  };
+
+  const onSwipeUp = (e: React.PointerEvent) => {
+    if (swipeStartX.current == null) return;
+    const dx = e.clientX - swipeStartX.current;
+    swipeStartX.current = null;
+    if (Math.abs(dx) < 45) return;
+    goTab(dx < 0 ? 1 : -1);
+  };
+
   const panelTransition = {
     duration: 0.48,
     ease: [0.22, 1, 0.36, 1] as const,
@@ -370,13 +397,51 @@ function HowWeHelp({ className = "" }: HowWeHelpProps) {
         <div className="mt-8 sm:mt-10">
           {/* Mobile */}
           <div className="md:hidden">
-            <div className="relative h-[470px]">
-              <AnimatePresence mode="wait" initial={false}>
+            {/* position indicator (ABOVE the cards) */}
+            <div className="mb-4 flex flex-col items-center gap-2">
+              <div className="flex items-center gap-2.5">
+                {tabs.map((t, i) => {
+                  const isActive = t.id === activeId;
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      aria-label={`Show ${t.label}`}
+                      onClick={() => goToTab(i)}
+                      className="h-[7px] cursor-pointer rounded-full transition-all duration-300"
+                      style={{
+                        width: isActive ? 30 : 10,
+                        backgroundColor: isActive ? NEON : NEON_22,
+                      }}
+                    />
+                  );
+                })}
+              </div>
+
+              <div
+                className="text-[12px] font-semibold tracking-[0.1em]"
+                style={{ color: NEON_48 }}
+              >
+                ‹ swipe › {activeTab.number} / {String(tabs.length).padStart(2, "0")}
+              </div>
+            </div>
+
+            {/* swipeable card */}
+            <div
+              className="relative h-[470px] cursor-grab touch-pan-y select-none active:cursor-grabbing"
+              onPointerDown={onSwipeDown}
+              onPointerUp={onSwipeUp}
+              onPointerCancel={() => {
+                swipeStartX.current = null;
+              }}
+            >
+              <AnimatePresence mode="wait" custom={swipeDir} initial={false}>
                 <motion.div
                   key={activeTab.id}
-                  initial={{ opacity: 0, scale: 0.985 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.985 }}
+                  custom={swipeDir}
+                  initial={{ opacity: 0, x: swipeDir > 0 ? 64 : -64 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: swipeDir > 0 ? -64 : 64 }}
                   transition={panelTransition}
                   className="absolute inset-0 will-change-transform"
                 >
@@ -385,15 +450,16 @@ function HowWeHelp({ className = "" }: HowWeHelpProps) {
               </AnimatePresence>
             </div>
 
-            <div className="mt-5 flex gap-3 overflow-x-auto pb-2">
-              {tabs.map((t) => {
+            {/* named tab buttons (restored, below) */}
+            <div className="no-scrollbar mt-5 flex gap-3 overflow-x-auto pb-2">
+              {tabs.map((t, i) => {
                 const isActive = t.id === activeId;
                 return (
                   <button
                     key={t.id}
                     type="button"
-                    onClick={() => setActiveId(t.id)}
-                    className="shrink-0 rounded-full px-4 py-2 text-[12px] font-semibold border transition-all duration-300"
+                    onClick={() => goToTab(i)}
+                    className="shrink-0 cursor-pointer rounded-full border px-4 py-2 text-[12px] font-semibold transition-all duration-300"
                     style={{
                       borderColor: isActive ? NEON : NEON_22,
                       backgroundColor: isActive ? NEON : "rgba(255,255,255,0.04)",

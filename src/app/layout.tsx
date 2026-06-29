@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Cairo } from "next/font/google";
 import "./globals.css";
+import SmoothScroll from "@/components/SmoothScroll";
 
 const godber = localFont({
   src: "../assets/fonts/godber/Godber.ttf",
@@ -57,7 +58,10 @@ export default function RootLayout({
       className={`${godber.variable} ${kollektif.variable} ${cairo.variable} font-en`}
       suppressHydrationWarning
     >
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        <SmoothScroll />
+        {children}
+      </body>
     </html>
   );
 }

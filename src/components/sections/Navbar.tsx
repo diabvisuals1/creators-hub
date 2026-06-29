@@ -9,10 +9,10 @@ import { FaWhatsapp } from "react-icons/fa";
 import { AnimatePresence, motion } from "framer-motion";
 
 const navLinks = [
-  { href: "#our-work", label: "OUR WORK" },
-  { href: "#services", label: "SERVICES" },
-  { href: "#about-us", label: "ABOUT US" },
-  { href: "#testimonials", label: "TESTIMONIALS" },
+  { href: "#how-we-help", label: "SERVICES" },
+  { href: "#selected-projects", label: "OUR WORK" },
+  { href: "#testimonials", label: "WHY US" },
+  { href: "#about", label: "ABOUT US" },
 ];
 
 export default function Navbar() {
@@ -23,8 +23,8 @@ export default function Navbar() {
   const navWrapRef = useRef<HTMLDivElement>(null);
 
   // حط رقم الواتساب هنا بصيغة دولية من غير + ولا مسافات
-  const whatsappNumber = "201012345678";
-  const whatsappMessage = "Hello, I want to contact you";
+  const whatsappNumber = "201105494439";
+  const whatsappMessage = "Hello Creators Hub, I'd like to start a project.";
   const whatsappHref = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
     whatsappMessage
   )}`;
@@ -155,6 +155,7 @@ export default function Navbar() {
                   <Link
                     key={l.href}
                     href={l.href}
+                    scroll={false}
                     className="
                       group relative
                       text-[12px] font-semibold tracking-[0.12em]
@@ -192,6 +193,7 @@ export default function Navbar() {
                 >
                   <Link
                     href="#contact"
+                    scroll={false}
                     className="
                       hidden sm:flex
                       h-[44px]
@@ -202,11 +204,12 @@ export default function Navbar() {
                       text-[13px]
                       font-semibold
                       text-white
-                      border border-[#00FFB6]/40
+                      border border-[#00FFB6]/60
                       transition-all duration-300
-                      hover:border-[#00FFB6]/80
-                      hover:bg-[#00FFB6]/10
-                      hover:shadow-[0_0_20px_rgba(0,255,182,0.25)]
+                      hover:border-[#00FFB6]
+                      hover:bg-[#00FFB6]
+                      hover:text-[#081B17]
+                      hover:shadow-[0_0_22px_rgba(0,255,182,0.45)]
                     "
                     aria-label="Start a project"
                     onClick={() => setMenuOpen(false)}
@@ -227,6 +230,7 @@ export default function Navbar() {
                 >
                   <Link
                     href="#contact"
+                    scroll={false}
                     className="
                       h-[44px]
                       w-[44px]
@@ -235,11 +239,12 @@ export default function Navbar() {
                       items-center
                       justify-center
                       text-white
-                      border border-[#00FFB6]/40
+                      border border-[#00FFB6]/60
                       transition-all duration-300
-                      hover:border-[#00FFB6]/80
-                      hover:bg-[#00FFB6]/10
-                      hover:shadow-[0_0_20px_rgba(0,255,182,0.25)]
+                      hover:border-[#00FFB6]
+                      hover:bg-[#00FFB6]
+                      hover:text-[#081B17]
+                      hover:shadow-[0_0_22px_rgba(0,255,182,0.45)]
                     "
                     aria-label="Start a project"
                     onClick={() => setMenuOpen(false)}
@@ -303,6 +308,7 @@ export default function Navbar() {
                       <Link
                         key={l.href}
                         href={l.href}
+                        scroll={false}
                         onClick={() => setMenuOpen(false)}
                         className="
                           relative

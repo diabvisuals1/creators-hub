@@ -450,40 +450,63 @@ export default function SelectedProjects() {
 
   const startXRef = useRef<number | null>(null);
   const lastXRef = useRef<number | null>(null);
+  const startYRef = useRef<number | null>(null);
+  const lastYRef = useRef<number | null>(null);
   const draggingRef = useRef(false);
 
   const onCardPointerDown = (e: React.PointerEvent) => {
     if (isFullscreen) return;
 
-    const t = e.target as HTMLElement | null;
-    if (t?.closest?.("[data-play-btn]")) return;
-
     draggingRef.current = true;
     startXRef.current = e.clientX;
+    startYRef.current = e.clientY;
     lastXRef.current = e.clientX;
+    lastYRef.current = e.clientY;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
 
   const onCardPointerMove = (e: React.PointerEvent) => {
     if (!draggingRef.current || isFullscreen) return;
     lastXRef.current = e.clientX;
+    lastYRef.current = e.clientY;
+  };
+
+  const resetPointer = () => {
+    draggingRef.current = false;
+    startXRef.current = null;
+    lastXRef.current = null;
+    startYRef.current = null;
+    lastYRef.current = null;
   };
 
   const onCardPointerUp = () => {
     if (!draggingRef.current || isFullscreen) return;
-    draggingRef.current = false;
 
     const startX = startXRef.current;
     const lastX = lastXRef.current;
-    startXRef.current = null;
-    lastXRef.current = null;
+    const startY = startYRef.current;
+    const lastY = lastYRef.current;
+    resetPointer();
 
-    if (startX == null || lastX == null) return;
+    if (startX == null || lastX == null || startY == null || lastY == null) return;
 
     const dx = lastX - startX;
-    if (Math.abs(dx) < 70) return;
+    const dy = lastY - startY;
 
-    go(dx < 0 ? 1 : -1);
+    // horizontal drag → swipe to next / prev project
+    if (Math.abs(dx) >= 70) {
+      go(dx < 0 ? 1 : -1);
+      return;
+    }
+
+    // a tap / click anywhere on the card (no real movement) → open the project
+    if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
+      setIsFullscreen(true);
+    }
+  };
+
+  const onCardPointerCancel = () => {
+    resetPointer();
   };
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -583,6 +606,41 @@ export default function SelectedProjects() {
       stopRAF();
     };
   }, [isFullscreen, isGallery, activeItem.id, muted, startRAF, stopRAF]);
+
+  const uiHideTimer = useRef<number | null>(null);
+
+  const pokeVideoUi = useCallback(() => {
+    if (isMobileView || isGallery) return;
+    setShowVideoUi(true);
+    if (uiHideTimer.current) {
+      clearTimeout(uiHideTimer.current);
+      uiHideTimer.current = null;
+    }
+    if (isPlaying) {
+      uiHideTimer.current = window.setTimeout(() => setShowVideoUi(false), 1500);
+    }
+  }, [isMobileView, isGallery, isPlaying]);
+
+  const hideVideoUiNow = useCallback(() => {
+    if (uiHideTimer.current) {
+      clearTimeout(uiHideTimer.current);
+      uiHideTimer.current = null;
+    }
+    setShowVideoUi(false);
+  }, []);
+
+  // While playing, hide all UI 1.5s after the last activity (so only the video shows).
+  // Paused → keep the controls visible.
+  useEffect(() => {
+    if (!isFullscreen || isMobileView || isGallery) return;
+    pokeVideoUi();
+    return () => {
+      if (uiHideTimer.current) {
+        clearTimeout(uiHideTimer.current);
+        uiHideTimer.current = null;
+      }
+    };
+  }, [isFullscreen, isMobileView, isGallery, pokeVideoUi]);
 
   const shouldShowDesktopUi = !isMobileView && showVideoUi;
 
@@ -828,7 +886,7 @@ export default function SelectedProjects() {
                     onPointerDown={onCardPointerDown}
                     onPointerMove={onCardPointerMove}
                     onPointerUp={onCardPointerUp}
-                    onPointerCancel={onCardPointerUp}
+                    onPointerCancel={onCardPointerCancel}
                   >
                     <AnimatePresence mode="wait" custom={direction} initial={false}>
                       <motion.div
@@ -875,26 +933,17 @@ export default function SelectedProjects() {
                           {activeCat.label.split("/")[0]?.trim()}
                         </motion.div>
 
-                        <button
-                          data-play-btn
-                          type="button"
-                          aria-label={isGallery ? "Explore gallery" : "Play video"}
-                          onPointerDownCapture={(e) => e.stopPropagation()}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setIsFullscreen(true);
-                          }}
-                          className="absolute left-1/2 top-1/2 z-[60] flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-3 cursor-pointer"
+                        <div
+                          aria-hidden="true"
+                          className="pointer-events-none absolute left-1/2 top-1/2 z-[60] flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-3"
                         >
                           <motion.img
                             src="/playicon.svg"
                             alt=""
                             draggable={false}
-                            whileHover={{ scale: 1.08 }}
-                            whileTap={{ scale: 0.94 }}
                             animate={{ y: [0, -5, 0] }}
                             transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-                            style={{ width: 96, height: 96, cursor: "pointer" }}
+                            style={{ width: 96, height: 96 }}
                           />
                           <motion.span
                             className="rounded-full px-3 py-1 text-[11px] font-extrabold tracking-[0.22em]"
@@ -904,7 +953,7 @@ export default function SelectedProjects() {
                           >
                             {isGallery ? "EXPLORE" : "WATCH"}
                           </motion.span>
-                        </button>
+                        </div>
                       </motion.div>
                     </AnimatePresence>
 
@@ -968,18 +1017,19 @@ export default function SelectedProjects() {
         {isFullscreen && (
           <motion.div
             className="absolute inset-0 z-[200] overflow-hidden"
+            style={{
+              "--cat": activeCat.accent,
+              "--catSoft": `${activeCat.accent}33`,
+              "--catGlow": `${activeCat.accent}55`,
+            } as React.CSSProperties}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onMouseEnter={() => {
-              if (!isMobileView && !isGallery) setShowVideoUi(true);
-            }}
+            onMouseEnter={pokeVideoUi}
             onMouseLeave={() => {
-              if (!isMobileView && !isGallery) setShowVideoUi(false);
+              if (!isMobileView && !isGallery) hideVideoUiNow();
             }}
-            onMouseMove={() => {
-              if (!isMobileView && !isGallery) setShowVideoUi(true);
-            }}
+            onMouseMove={pokeVideoUi}
           >
             {isGallery ? (
               <GalleryFullscreen
@@ -1004,11 +1054,11 @@ export default function SelectedProjects() {
                     {activeCat.subtitle}
                   </div>
 
-                  <div className="mt-4 font-extrabold leading-[0.9] tracking-tight">
-                    <div className="text-[30px]">
+                  <div className="mt-3 font-extrabold leading-[0.95] tracking-tight">
+                    <div className="text-[20px]">
                       {activeItem.title.split("/")[0]?.trim()}
                     </div>
-                    <div className="text-[30px]">
+                    <div className="text-[20px]">
                       / {activeItem.title.split("/")[1]?.trim()}
                     </div>
                   </div>
@@ -1018,7 +1068,7 @@ export default function SelectedProjects() {
                   type="button"
                   aria-label="Close"
                   onClick={() => setIsFullscreen(false)}
-                  className="absolute right-4 top-4 z-[250] grid h-[42px] w-[42px] cursor-pointer place-items-center rounded-full bg-black/26 backdrop-blur-sm"
+                  className="absolute right-4 top-4 z-[250] grid h-[42px] w-[42px] cursor-pointer place-items-center rounded-full bg-black/26 backdrop-blur-sm transition-colors hover:bg-[var(--catSoft)]"
                 >
                   <IconImg src={VIDEO_ICONS.close} alt="Close" size={14} />
                 </button>
@@ -1065,7 +1115,7 @@ export default function SelectedProjects() {
                       <button
                         type="button"
                         onClick={togglePlay}
-                        className="grid h-[46px] w-[46px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/12 transition"
+                        className="grid h-[46px] w-[46px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/12 transition-colors hover:bg-[var(--catSoft)]"
                         aria-label={isPlaying ? "Pause" : "Play"}
                       >
                         <IconImg
@@ -1078,7 +1128,7 @@ export default function SelectedProjects() {
                       <button
                         type="button"
                         onClick={toggleMute}
-                        className="grid h-[46px] w-[46px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/12 transition"
+                        className="grid h-[46px] w-[46px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/12 transition-colors hover:bg-[var(--catSoft)]"
                         aria-label={muted ? "Unmute" : "Mute"}
                       >
                         <IconImg
@@ -1125,27 +1175,11 @@ export default function SelectedProjects() {
                       </div>
                     </div>
 
-                    <div className="mt-4">
-                      <p
-                        className="text-[13px] leading-[1.45] text-white/88"
-                        style={{
-                          display: "-webkit-box",
-                          WebkitLineClamp: 4,
-                          WebkitBoxOrient: "vertical",
-                          overflow: "hidden",
-                          maskImage:
-                            "linear-gradient(180deg, rgba(0,0,0,1) 72%, rgba(0,0,0,0.45) 88%, rgba(0,0,0,0) 100%)",
-                        }}
-                      >
-                        {activeCat.blurb.join(" ")}
-                      </p>
-                    </div>
-
                     <div className="mt-4 flex items-center gap-2">
                       <button
                         type="button"
                         onClick={() => go(-1)}
-                        className="grid h-[42px] w-[42px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/10"
+                        className="grid h-[42px] w-[42px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/10 transition-colors hover:bg-[var(--catSoft)]"
                         aria-label="Previous project"
                       >
                         <IconImg src={VIDEO_ICONS.prev} alt="Previous" size={16} />
@@ -1170,7 +1204,7 @@ export default function SelectedProjects() {
                               type="button"
                               onClick={() => goToItem(i)}
                               aria-label={`Open ${it.title}`}
-                              className="relative shrink-0 overflow-hidden rounded-[8px] transition-all duration-300"
+                              className="relative shrink-0 cursor-pointer overflow-hidden rounded-[8px] transition-all duration-300"
                               style={{
                                 width: activeThumb ? 130 : 100,
                                 height: activeThumb ? 80 : 70,
@@ -1207,7 +1241,7 @@ export default function SelectedProjects() {
                       <button
                         type="button"
                         onClick={() => go(1)}
-                        className="grid h-[42px] w-[42px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/10"
+                        className="grid h-[42px] w-[42px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/10 transition-colors hover:bg-[var(--catSoft)]"
                         aria-label="Next project"
                       >
                         <IconImg src={VIDEO_ICONS.next} alt="Next" size={16} />
@@ -1286,7 +1320,7 @@ export default function SelectedProjects() {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.92 }}
                         transition={{ duration: 0.18 }}
-                        className="absolute right-7 top-7 z-[240] grid h-[40px] w-[40px] cursor-pointer place-items-center rounded-full bg-black/22 backdrop-blur-sm"
+                        className="absolute right-7 top-7 z-[240] grid h-[40px] w-[40px] cursor-pointer place-items-center rounded-full bg-black/22 backdrop-blur-sm transition-colors hover:bg-[var(--catSoft)]"
                       >
                         <IconImg src={VIDEO_ICONS.close} alt="Close" size={13} />
                       </motion.button>
@@ -1306,19 +1340,13 @@ export default function SelectedProjects() {
                           {activeCat.subtitle}
                         </div>
 
-                        <div className="mt-5 font-extrabold leading-[0.92] tracking-tight">
-                          <div className="text-[52px] sm:text-[72px] lg:text-[84px]">
+                        <div className="mt-4 font-extrabold leading-[0.95] tracking-tight">
+                          <div className="text-[24px] sm:text-[30px] lg:text-[36px]">
                             {activeItem.title.split("/")[0]?.trim()}
                           </div>
-                          <div className="text-[52px] sm:text-[72px] lg:text-[84px]">
+                          <div className="text-[24px] sm:text-[30px] lg:text-[36px]">
                             / {activeItem.title.split("/")[1]?.trim()}
                           </div>
-                        </div>
-
-                        <div className="mt-10 max-w-[500px] space-y-7 text-[17px] leading-[1.42] opacity-100 sm:text-[20px] lg:text-[22px]">
-                          {activeCat.blurb.map((p, i) => (
-                            <p key={i}>{p}</p>
-                          ))}
                         </div>
                       </motion.div>
 
@@ -1336,7 +1364,7 @@ export default function SelectedProjects() {
                           className={[
                             "grid h-[54px] w-[54px] shrink-0 place-items-center rounded-full backdrop-blur-sm transition",
                             canGoThumbPrev
-                              ? "cursor-pointer bg-white/12 hover:bg-white/18"
+                              ? "cursor-pointer bg-white/12 hover:bg-[var(--catSoft)] hover:shadow-[0_0_16px_var(--catGlow)]"
                               : "cursor-not-allowed bg-white/6 opacity-35",
                           ].join(" ")}
                           aria-label="Previous projects"
@@ -1356,7 +1384,7 @@ export default function SelectedProjects() {
                                 type="button"
                                 onClick={() => goToItem(itIndex)}
                                 aria-label={`Open ${it.title}`}
-                                className="relative h-[96px] w-[158px] shrink-0 overflow-hidden rounded-[6px] transition-all duration-300"
+                                className="relative h-[96px] w-[158px] shrink-0 cursor-pointer overflow-hidden rounded-[6px] transition-all duration-300 hover:scale-[1.05]"
                                 style={{
                                   opacity: activeThumb ? 1 : 0.92,
                                   transform: activeThumb ? "scale(1.035)" : "scale(1)",
@@ -1404,7 +1432,7 @@ export default function SelectedProjects() {
                           className={[
                             "grid h-[54px] w-[54px] shrink-0 place-items-center rounded-full backdrop-blur-sm transition",
                             canGoThumbNext
-                              ? "cursor-pointer bg-white/12 hover:bg-white/18"
+                              ? "cursor-pointer bg-white/12 hover:bg-[var(--catSoft)] hover:shadow-[0_0_16px_var(--catGlow)]"
                               : "cursor-not-allowed bg-white/6 opacity-35",
                           ].join(" ")}
                           aria-label="Next projects"
@@ -1424,7 +1452,7 @@ export default function SelectedProjects() {
                           <button
                             type="button"
                             onClick={togglePlay}
-                            className="grid h-[56px] w-[56px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/12 backdrop-blur-sm transition hover:bg-white/18"
+                            className="grid h-[56px] w-[56px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/12 backdrop-blur-sm transition hover:bg-[var(--catSoft)] hover:shadow-[0_0_16px_var(--catGlow)]"
                             aria-label={isPlaying ? "Pause" : "Play"}
                           >
                             <IconImg
@@ -1437,7 +1465,7 @@ export default function SelectedProjects() {
                           <button
                             type="button"
                             onClick={toggleMute}
-                            className="grid h-[56px] w-[56px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/12 backdrop-blur-sm transition hover:bg-white/18"
+                            className="grid h-[56px] w-[56px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/12 backdrop-blur-sm transition hover:bg-[var(--catSoft)] hover:shadow-[0_0_16px_var(--catGlow)]"
                             aria-label={muted ? "Unmute" : "Mute"}
                           >
                             <IconImg
@@ -1523,9 +1551,24 @@ function GalleryFullscreen({
   const images = category.items;
   const ratio = category.galleryRatio ?? "16 / 9";
   const accent = category.accent;
+  const total = images.length;
+
+  const [lightbox, setLightbox] = useState<number | null>(null);
+  const openPrev = () =>
+    setLightbox((v) => (v === null ? v : (v - 1 + total) % total));
+  const openNext = () =>
+    setLightbox((v) => (v === null ? v : (v + 1) % total));
+  const current = lightbox === null ? null : images[lightbox];
 
   return (
-    <div className="absolute inset-0 overflow-hidden bg-[#06111B]">
+    <div
+      className="absolute inset-0 overflow-hidden bg-[#06111B]"
+      style={{
+        "--cat": accent,
+        "--catSoft": `${accent}33`,
+        "--catGlow": `${accent}55`,
+      } as React.CSSProperties}
+    >
       {/* playful accent glow blobs */}
       <motion.div
         aria-hidden="true"
@@ -1573,7 +1616,7 @@ function GalleryFullscreen({
         type="button"
         aria-label="Close"
         onClick={onClose}
-        className="absolute right-4 top-4 z-[250] grid h-[42px] w-[42px] cursor-pointer place-items-center rounded-full bg-black/26 backdrop-blur-sm sm:right-7 sm:top-7"
+        className="absolute right-4 top-4 z-[250] grid h-[42px] w-[42px] cursor-pointer place-items-center rounded-full bg-black/26 backdrop-blur-sm transition-colors hover:bg-[var(--catSoft)] sm:right-7 sm:top-7"
       >
         <IconImg src={VIDEO_ICONS.close} alt="Close" size={14} />
       </button>
@@ -1595,8 +1638,11 @@ function GalleryFullscreen({
           }}
         >
           {images.map((it, i) => (
-            <motion.div
+            <motion.button
               key={it.id}
+              type="button"
+              onClick={() => setLightbox(i)}
+              aria-label={`Preview ${it.title}`}
               initial={{ opacity: 0, y: 26, scale: 0.92, rotate: i % 2 === 0 ? -2 : 2 }}
               animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
               transition={{
@@ -1606,7 +1652,8 @@ function GalleryFullscreen({
                 damping: 20,
               }}
               whileHover={{ y: -6, scale: 1.025 }}
-              className="group relative overflow-hidden rounded-[12px] border border-white/10 bg-black/40"
+              whileTap={{ scale: 0.99 }}
+              className="group relative cursor-pointer overflow-hidden rounded-[12px] border border-white/10 bg-black/40 text-left"
               style={{
                 aspectRatio: ratio,
                 boxShadow: "0 16px 38px rgba(0,0,0,0.34)",
@@ -1634,7 +1681,15 @@ function GalleryFullscreen({
               <span className="absolute bottom-3 left-3 right-3 truncate text-[12px] font-bold tracking-wide text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                 {it.title}
               </span>
-            </motion.div>
+
+              {/* hover "view" hint */}
+              <span
+                className="absolute right-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-extrabold tracking-[0.12em] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                style={{ backgroundColor: accent, color: "#0B0F2A" }}
+              >
+                VIEW
+              </span>
+            </motion.button>
           ))}
         </div>
       </div>
@@ -1645,7 +1700,7 @@ function GalleryFullscreen({
           <button
             type="button"
             onClick={onPrevCat}
-            className="grid h-[44px] w-[44px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/10 backdrop-blur-sm transition hover:bg-white/18"
+            className="grid h-[44px] w-[44px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/10 backdrop-blur-sm transition hover:bg-[var(--catSoft)] hover:shadow-[0_0_16px_var(--catGlow)]"
             aria-label="Previous category"
           >
             <IconImg src={VIDEO_ICONS.prev} alt="Previous" size={18} />
@@ -1662,7 +1717,7 @@ function GalleryFullscreen({
                   key={c.id}
                   type="button"
                   onClick={() => onSelectCategory(i)}
-                  className="flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-[11px] font-bold tracking-[0.04em] transition-all duration-300"
+                  className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-3 py-2 text-[11px] font-bold tracking-[0.04em] transition-all duration-300 hover:-translate-y-[2px]"
                   style={{
                     backgroundColor: activeChip ? c.accent : "rgba(255,255,255,0.08)",
                     color: activeChip ? "#0B0F2A" : "rgba(255,255,255,0.78)",
@@ -1679,13 +1734,99 @@ function GalleryFullscreen({
           <button
             type="button"
             onClick={onNextCat}
-            className="grid h-[44px] w-[44px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/10 backdrop-blur-sm transition hover:bg-white/18"
+            className="grid h-[44px] w-[44px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/10 backdrop-blur-sm transition hover:bg-[var(--catSoft)] hover:shadow-[0_0_16px_var(--catGlow)]"
             aria-label="Next category"
           >
             <IconImg src={VIDEO_ICONS.next} alt="Next" size={18} />
           </button>
         </div>
       </div>
+
+      {/* per-design preview (lightbox) */}
+      <AnimatePresence>
+        {current && (
+          <motion.div
+            className="absolute inset-0 z-[300] flex items-center justify-center bg-black/90 px-4 backdrop-blur-md"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setLightbox(null)}
+          >
+            <button
+              type="button"
+              aria-label="Close preview"
+              onClick={() => setLightbox(null)}
+              className="absolute right-4 top-4 z-[320] grid h-[44px] w-[44px] cursor-pointer place-items-center rounded-full bg-white/10 backdrop-blur-sm transition-colors hover:bg-[var(--catSoft)] hover:shadow-[0_0_16px_var(--catGlow)]"
+            >
+              <IconImg src={VIDEO_ICONS.close} alt="Close" size={15} />
+            </button>
+
+            {total > 1 && (
+              <>
+                <button
+                  type="button"
+                  aria-label="Previous design"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openPrev();
+                  }}
+                  className="absolute left-3 top-1/2 z-[320] grid h-[48px] w-[48px] -translate-y-1/2 cursor-pointer place-items-center rounded-full bg-white/10 backdrop-blur-sm transition-colors hover:bg-[var(--catSoft)] hover:shadow-[0_0_16px_var(--catGlow)] sm:left-6"
+                >
+                  <IconImg src={VIDEO_ICONS.prev} alt="Previous" size={20} />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Next design"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openNext();
+                  }}
+                  className="absolute right-3 top-1/2 z-[320] grid h-[48px] w-[48px] -translate-y-1/2 cursor-pointer place-items-center rounded-full bg-white/10 backdrop-blur-sm transition-colors hover:bg-[var(--catSoft)] hover:shadow-[0_0_16px_var(--catGlow)] sm:right-6"
+                >
+                  <IconImg src={VIDEO_ICONS.next} alt="Next" size={20} />
+                </button>
+              </>
+            )}
+
+            <motion.div
+              key={current.id}
+              className="relative flex max-h-[88vh] w-full max-w-[1100px] flex-col items-center"
+              initial={{ opacity: 0, scale: 0.96, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 220, damping: 24 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div
+                className="relative overflow-hidden rounded-[14px]"
+                style={{
+                  border: `1px solid ${accent}`,
+                  boxShadow: `0 30px 80px rgba(0,0,0,0.55), 0 0 0 4px ${accent}1f`,
+                }}
+              >
+                <ThumbImage
+                  src={current.poster}
+                  alt={current.title}
+                  className="block max-h-[74vh] w-auto max-w-full object-contain"
+                />
+              </div>
+
+              <div className="mt-4 flex items-center gap-3 text-white">
+                <span
+                  className="rounded-full px-3 py-1 text-[11px] font-extrabold tracking-[0.12em]"
+                  style={{ backgroundColor: accent, color: "#0B0F2A" }}
+                >
+                  {category.emoji} {String((lightbox ?? 0) + 1).padStart(2, "0")} /{" "}
+                  {String(total).padStart(2, "0")}
+                </span>
+                <span className="text-[14px] font-bold tracking-wide sm:text-[16px]">
+                  {current.title}
+                </span>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

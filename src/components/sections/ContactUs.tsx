@@ -1,9 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import emailjs from "@emailjs/browser";
+import { useState } from "react";
 import { FiArrowRight } from "react-icons/fi";
-import { motion } from "framer-motion";
 
 const YELLOW = "#F3FF00";
 const NAVY = "#151A43";
@@ -48,7 +46,7 @@ function getErrorMessage(error: unknown): string {
     }
   }
 
-  return "Failed to send message. Please check your EmailJS settings.";
+  return "Failed to send your message. Please try again.";
 }
 
 export default function ContactUs() {
@@ -64,15 +62,6 @@ export default function ContactUs() {
     type: "idle",
     message: "",
   });
-
-  const emailJsConfig = useMemo(
-    () => ({
-      serviceId: process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID?.trim() || "",
-      templateId: process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID?.trim() || "",
-      publicKey: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY?.trim() || "",
-    }),
-    []
-  );
 
   function onChange<K extends keyof FormState>(key: K, val: string) {
     setForm((prev) => ({ ...prev, [key]: val }));
@@ -107,15 +96,12 @@ export default function ContactUs() {
       return;
     }
 
-    if (
-      !emailJsConfig.serviceId ||
-      !emailJsConfig.templateId ||
-      !emailJsConfig.publicKey
-    ) {
+    const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_KEY?.trim() || "";
+    if (!accessKey) {
       setStatus({
         type: "error",
         message:
-          "EmailJS is not configured yet. Add NEXT_PUBLIC_EMAILJS_SERVICE_ID, NEXT_PUBLIC_EMAILJS_TEMPLATE_ID, and NEXT_PUBLIC_EMAILJS_PUBLIC_KEY.",
+          "The contact form isn't connected yet. Add your Web3Forms access key (NEXT_PUBLIC_WEB3FORMS_KEY) in .env.local.",
       });
       return;
     }
@@ -124,25 +110,36 @@ export default function ContactUs() {
       setIsSubmitting(true);
       setStatus({ type: "idle", message: "" });
 
-      const response = await emailjs.send(
-        emailJsConfig.serviceId,
-        emailJsConfig.templateId,
-        {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          access_key: accessKey,
+          subject: `New inquiry — ${payload.service || "Creators Hub"}`,
+          from_name: "Creators Hub Website",
           name: payload.name,
           email: payload.email,
           service: payload.service,
           message: payload.message,
-        },
-        emailJsConfig.publicKey
-      );
+        }),
+      });
 
-      if (response.status !== 200) {
-        throw new Error("EmailJS did not accept the request.");
+      const data = await response.json();
+
+      if (!response.ok || !data?.success) {
+        throw new Error(
+          (data && typeof data.message === "string" && data.message) ||
+            "The request was not accepted. Please try again."
+        );
       }
 
       setStatus({
         type: "success",
-        message: "Your message has been sent successfully.",
+        message:
+          "Your message has been sent successfully. We'll get back to you soon.",
       });
 
       setForm({
@@ -152,7 +149,7 @@ export default function ContactUs() {
         message: "",
       });
     } catch (error: unknown) {
-      console.error("EmailJS send error:", error);
+      console.error("Contact form error:", error);
 
       setStatus({
         type: "error",
@@ -259,51 +256,25 @@ export default function ContactUs() {
                       </div>
                     )}
 
-                    <div className="flex items-stretch gap-3 pt-2">
-                      <motion.button
+                    <div className="group flex items-stretch gap-3 pt-2">
+                      <button
                         type="submit"
                         disabled={isSubmitting}
-                        whileHover={{
-                          y: isSubmitting ? 0 : -2,
-                          scale: isSubmitting ? 1 : 1.01,
-                        }}
-                        whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 240,
-                          damping: 18,
-                        }}
-                        className="h-[52px] flex-1 cursor-pointer rounded-[10px] font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
-                        style={{
-                          backgroundColor: RED,
-                          boxShadow: "0 18px 50px rgba(255,30,30,0.26)",
-                        }}
+                        className="h-[52px] flex-1 cursor-pointer rounded-[10px] font-semibold text-white shadow-[0_18px_50px_rgba(255,30,30,0.26)] transition-all duration-300 group-hover:-translate-y-[2px] group-hover:shadow-[0_22px_55px_rgba(255,30,30,0.34)] active:translate-y-0 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70 disabled:group-hover:translate-y-0 disabled:group-hover:shadow-[0_18px_50px_rgba(255,30,30,0.26)]"
+                        style={{ backgroundColor: RED }}
                       >
                         {isSubmitting ? "Sending..." : "Send Message"}
-                      </motion.button>
+                      </button>
 
-                      <motion.button
+                      <button
                         type="submit"
                         aria-label="Send"
                         disabled={isSubmitting}
-                        whileHover={{
-                          y: isSubmitting ? 0 : -2,
-                          scale: isSubmitting ? 1 : 1.03,
-                        }}
-                        whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 240,
-                          damping: 18,
-                        }}
-                        className="grid h-[52px] w-[58px] cursor-pointer place-items-center rounded-[10px] disabled:cursor-not-allowed disabled:opacity-70"
-                        style={{
-                          backgroundColor: RED,
-                          boxShadow: "0 18px 50px rgba(255,30,30,0.26)",
-                        }}
+                        className="grid h-[52px] w-[58px] cursor-pointer place-items-center rounded-[10px] text-white shadow-[0_18px_50px_rgba(255,30,30,0.26)] transition-all duration-300 group-hover:-translate-y-[2px] group-hover:shadow-[0_22px_55px_rgba(255,30,30,0.34)] active:translate-y-0 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70 disabled:group-hover:translate-y-0 disabled:group-hover:shadow-[0_18px_50px_rgba(255,30,30,0.26)]"
+                        style={{ backgroundColor: RED }}
                       >
                         <FiArrowRight className="text-[20px] text-white" />
-                      </motion.button>
+                      </button>
                     </div>
                   </form>
                 </div>

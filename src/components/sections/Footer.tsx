@@ -9,10 +9,10 @@ export default function Footer() {
       <div className="relative w-full overflow-hidden">
         <div className="relative w-full h-[533.33px] max-[1023px]:h-[420px] max-[767px]:h-[360px]">
           <img
-            src="/footer/footer-hero.jpeg"
+            src="/footer/footerimg.png"
             alt=""
             draggable={false}
-            className="h-full w-full object-cover object-[50%_35%] select-none pointer-events-none"
+            className="h-full w-full object-cover object-center select-none pointer-events-none"
           />
           <div className="absolute inset-0 bg-black/5" />
 
@@ -28,23 +28,17 @@ export default function Footer() {
               shadow-[0_14px_40px_rgba(0,0,0,0.22)]
               overflow-hidden
 
-              /* Desktop exact */
-              right-[56px] top-[44px]
+              /* centered in the empty middle of the footer image */
+              left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
               w-[342.33px] h-[329.36px]
               px-[22px] pt-[18px] pb-[18px]
 
               /* Tablet */
-              max-[1023px]:right-[28px] max-[1023px]:top-[26px]
               max-[1023px]:w-[320px] max-[1023px]:h-[305px]
               max-[1023px]:px-[20px] max-[1023px]:pt-[16px] max-[1023px]:pb-[16px]
 
-              /* Mobile: centered overlay فوق الصورة */
-              max-[767px]:left-1/2
-              max-[767px]:right-auto
-              max-[767px]:top-auto
-              max-[767px]:bottom-[18px]
-              max-[767px]:-translate-x-1/2
-              max-[767px]:w-[min(92vw,342.33px)]
+              /* Mobile */
+              max-[767px]:w-[min(88vw,342.33px)]
               max-[767px]:h-auto
               max-[767px]:px-[18px] max-[767px]:pt-[16px] max-[767px]:pb-[16px]
             "
@@ -106,7 +100,7 @@ export default function Footer() {
                     <ul className="mt-4 space-y-2 text-[12px]">
                       <li>
                         <a
-                          href="#our-work"
+                          href="#selected-projects"
                           className="text-white transition-opacity duration-200 hover:opacity-75 focus:opacity-75 focus:outline-none"
                         >
                           Our Work
@@ -114,7 +108,7 @@ export default function Footer() {
                       </li>
                       <li>
                         <a
-                          href="#services"
+                          href="#how-we-help"
                           className="text-white transition-opacity duration-200 hover:opacity-75 focus:opacity-75 focus:outline-none"
                         >
                           Services
@@ -122,7 +116,7 @@ export default function Footer() {
                       </li>
                       <li>
                         <a
-                          href="#about-us"
+                          href="#about"
                           className="text-white transition-opacity duration-200 hover:opacity-75 focus:opacity-75 focus:outline-none"
                         >
                           About Us

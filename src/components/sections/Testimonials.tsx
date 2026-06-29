@@ -146,7 +146,7 @@ export default function Testimonials() {
 
           <h2
             id="testimonials-heading"
-            className="mt-3 text-[30px] font-extrabold leading-[0.95] tracking-tight sm:text-[42px] lg:text-[56px]"
+            className="mt-3 text-[30px] font-extrabold uppercase leading-[0.95] tracking-tight sm:text-[42px] lg:text-[56px]"
             style={{ color: BRAND_NAVY }}
           >
             Why Work With Creators Hub

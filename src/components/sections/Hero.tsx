@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import Navbar from "@/components/sections/Navbar";
 import { FiSearch, FiChevronRight } from "react-icons/fi";
 import { motion } from "framer-motion";
@@ -61,48 +60,10 @@ function useTypeLoop(words: string[]) {
 }
 
 const companyLogos = [
-  {
-    name: "Mr Beast",
-    src: "/hero/logos/mrbeast.svg",
-    width: 170,
-    height: 42,
-    mobileWidth: 130,
-  },
-  {
-    name: "Bumble",
-    src: "/hero/logos/bumble.svg",
-    width: 130,
-    height: 32,
-    mobileWidth: 102,
-  },
-  {
-    name: "Schibsted",
-    src: "/hero/logos/schibsted.svg",
-    width: 138,
-    height: 32,
-    mobileWidth: 108,
-  },
-  {
-    name: "Opera",
-    src: "/hero/logos/opera.svg",
-    width: 118,
-    height: 36,
-    mobileWidth: 92,
-  },
-  {
-    name: "Bonterra",
-    src: "/hero/logos/bonterra.svg",
-    width: 142,
-    height: 34,
-    mobileWidth: 110,
-  },
-  {
-    name: "Zoom",
-    src: "/hero/logos/zoom.svg",
-    width: 118,
-    height: 30,
-    mobileWidth: 92,
-  },
+  { name: "Sangovi", src: "/hero/logos/sangovi.png", h: 68 },
+  { name: "Gamax", src: "/hero/logos/gamax.png", h: 62 },
+  { name: "Reedy Sports Club", src: "/hero/logos/reedy.png", h: 80 },
+  { name: "EWC", src: "/hero/logos/ewc.png", h: 40 },
 ];
 
 function HeroLogosBar() {
@@ -117,10 +78,10 @@ function HeroLogosBar() {
         <div
           className="
             flex flex-wrap items-center justify-center
-            gap-x-8 gap-y-5
-            py-5
-            sm:justify-between sm:gap-x-6 sm:py-6
-            md:py-7
+            gap-x-10 gap-y-6
+            py-6
+            sm:gap-x-14 sm:py-7
+            lg:gap-x-20
           "
         >
           {companyLogos.map((logo, index) => (
@@ -133,38 +94,22 @@ function HeroLogosBar() {
                 duration: 0.4,
                 ease: "easeOut",
               }}
-              whileHover={{
-                y: -3,
-                scale: 1.045,
-              }}
-              className="
-                group
-                flex cursor-default items-center justify-center
-                opacity-100
-                transition-transform duration-300
-              "
+              whileHover={{ y: -3 }}
+              className="group flex cursor-default items-center justify-center"
               aria-label={logo.name}
             >
-              <div
-                className="relative flex items-center justify-center"
-                style={{
-                  width: `clamp(${logo.mobileWidth}px, 10vw, ${logo.width}px)`,
-                  height: "42px",
-                }}
-              >
-                <Image
-                  src={logo.src}
-                  alt={logo.name}
-                  width={logo.width}
-                  height={logo.height}
-                  className="
-                    h-auto w-full object-contain
-                    transition-transform duration-300
-                    group-hover:scale-[1.04]
-                  "
-                  draggable={false}
-                />
-              </div>
+              <img
+                src={logo.src}
+                alt={logo.name}
+                draggable={false}
+                style={{ height: logo.h, width: "auto" }}
+                className="
+                  select-none object-contain
+                  opacity-60 grayscale
+                  transition-all duration-500 ease-out
+                  group-hover:scale-[1.05] group-hover:opacity-100 group-hover:grayscale-0
+                "
+              />
             </motion.div>
           ))}
         </div>
@@ -372,26 +317,23 @@ export default function Hero() {
                     stiffness: 160,
                     damping: 18,
                   }}
-                  className="mt-7 flex items-center gap-3 sm:mt-9"
+                  className="group mt-7 flex items-center gap-3 sm:mt-9"
                 >
-                  <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                    <Link
-                      href="#our-work"
-                      className="flex h-[48px] items-center justify-center rounded-[8px] bg-[#FF1E1E] px-6 text-[13px] font-semibold text-white transition-shadow duration-300 hover:shadow-[0_10px_30px_rgba(255,30,30,0.22)] sm:h-[54px] sm:px-8 sm:text-[14px]"
-                    >
-                      View Our Work
-                    </Link>
-                  </motion.div>
+                  <Link
+                    href="#our-work"
+                    scroll={false}
+                    className="flex h-[48px] items-center justify-center rounded-[8px] border-2 border-[#FF1E1E] bg-transparent px-6 text-[13px] font-semibold text-[#FF1E1E] transition-all duration-300 group-hover:bg-[#FF1E1E] group-hover:text-white group-hover:shadow-[0_10px_30px_rgba(255,30,30,0.28)] active:scale-[0.98] sm:h-[54px] sm:px-8 sm:text-[14px]"
+                  >
+                    View Our Work
+                  </Link>
 
-                  <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                    <Link
-                      href="/search"
-                      aria-label="Search"
-                      className="flex h-[48px] w-[48px] items-center justify-center rounded-[8px] bg-[#FF1E1E] text-white transition-shadow duration-300 hover:shadow-[0_10px_30px_rgba(255,30,30,0.22)] sm:h-[54px] sm:w-[54px]"
-                    >
-                      <FiChevronRight className="text-[18px] sm:text-[20px]" />
-                    </Link>
-                  </motion.div>
+                  <Link
+                    href="/search"
+                    aria-label="Search"
+                    className="flex h-[48px] w-[48px] items-center justify-center rounded-[8px] border-2 border-[#FF1E1E] bg-transparent text-[#FF1E1E] transition-all duration-300 group-hover:bg-[#FF1E1E] group-hover:text-white group-hover:shadow-[0_10px_30px_rgba(255,30,30,0.28)] active:scale-[0.98] sm:h-[54px] sm:w-[54px]"
+                  >
+                    <FiChevronRight className="text-[18px] sm:text-[20px]" />
+                  </Link>
                 </motion.div>
               </div>
             </div>
