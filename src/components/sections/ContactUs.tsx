@@ -63,6 +63,9 @@ export default function ContactUs() {
     message: "",
   });
 
+  // anti-spam honeypot: a hidden field that humans never see/fill, but bots do
+  const [honeypot, setHoneypot] = useState("");
+
   function onChange<K extends keyof FormState>(key: K, val: string) {
     setForm((prev) => ({ ...prev, [key]: val }));
   }
@@ -71,6 +74,17 @@ export default function ContactUs() {
     e.preventDefault();
 
     if (isSubmitting) return;
+
+    // bot caught by the honeypot → silently pretend it worked, send nothing
+    if (honeypot) {
+      setStatus({
+        type: "success",
+        message:
+          "Your message has been sent successfully. We'll get back to you soon.",
+      });
+      setForm({ name: "", email: "", service: "", message: "" });
+      return;
+    }
 
     const payload = {
       name: form.name.trim(),
@@ -96,12 +110,14 @@ export default function ContactUs() {
       return;
     }
 
+    const endpoint = process.env.NEXT_PUBLIC_FORM_ENDPOINT?.trim() || "";
     const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_KEY?.trim() || "";
-    if (!accessKey) {
+
+    if (!endpoint && !accessKey) {
       setStatus({
         type: "error",
         message:
-          "The contact form isn't connected yet. Add your Web3Forms access key (NEXT_PUBLIC_WEB3FORMS_KEY) in .env.local.",
+          "The contact form isn't connected yet. Add NEXT_PUBLIC_FORM_ENDPOINT (Google Apps Script) or NEXT_PUBLIC_WEB3FORMS_KEY.",
       });
       return;
     }
@@ -110,30 +126,47 @@ export default function ContactUs() {
       setIsSubmitting(true);
       setStatus({ type: "idle", message: "" });
 
-      const response = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          access_key: accessKey,
-          subject: `New inquiry — ${payload.service || "Creators Hub"}`,
-          from_name: "Creators Hub Website",
-          name: payload.name,
-          email: payload.email,
-          service: payload.service,
-          message: payload.message,
-        }),
-      });
+      if (endpoint) {
+        // Google Apps Script web app. Sent as a "simple" request (URL-encoded,
+        // no custom headers) so the browser skips the CORS preflight that Apps
+        // Script can't answer. Response is opaque (no-cors) — reaching here
+        // without a network error means the row was logged + email sent.
+        await fetch(endpoint, {
+          method: "POST",
+          mode: "no-cors",
+          body: new URLSearchParams({
+            name: payload.name,
+            email: payload.email,
+            service: payload.service,
+            message: payload.message,
+          }),
+        });
+      } else {
+        const response = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            access_key: accessKey,
+            subject: `New inquiry — ${payload.service || "Creators Hub"}`,
+            from_name: "Creators Hub Website",
+            name: payload.name,
+            email: payload.email,
+            service: payload.service,
+            message: payload.message,
+          }),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (!response.ok || !data?.success) {
-        throw new Error(
-          (data && typeof data.message === "string" && data.message) ||
-            "The request was not accepted. Please try again."
-        );
+        if (!response.ok || !data?.success) {
+          throw new Error(
+            (data && typeof data.message === "string" && data.message) ||
+              "The request was not accepted. Please try again."
+          );
+        }
       }
 
       setStatus({
@@ -213,6 +246,18 @@ export default function ContactUs() {
                   </h3>
 
                   <form onSubmit={onSubmit} className="mt-7 max-w-[560px] space-y-6">
+                    {/* honeypot: invisible to people, bots tend to fill it */}
+                    <input
+                      type="text"
+                      name="company"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      aria-hidden="true"
+                      value={honeypot}
+                      onChange={(e) => setHoneypot(e.target.value)}
+                      className="pointer-events-none absolute left-[-9999px] h-0 w-0 opacity-0"
+                    />
+
                     <Field
                       label="Name*"
                       placeholder="John Doe"
