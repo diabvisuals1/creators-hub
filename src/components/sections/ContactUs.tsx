@@ -111,13 +111,12 @@ export default function ContactUs() {
     }
 
     const endpoint = process.env.NEXT_PUBLIC_FORM_ENDPOINT?.trim() || "";
-    const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_KEY?.trim() || "";
 
-    if (!endpoint && !accessKey) {
+    if (!endpoint) {
       setStatus({
         type: "error",
         message:
-          "The contact form isn't connected yet. Add NEXT_PUBLIC_FORM_ENDPOINT (Google Apps Script) or NEXT_PUBLIC_WEB3FORMS_KEY.",
+          "The contact form isn't connected yet. Add NEXT_PUBLIC_FORM_ENDPOINT (your Google Apps Script Web App URL).",
       });
       return;
     }
@@ -126,48 +125,20 @@ export default function ContactUs() {
       setIsSubmitting(true);
       setStatus({ type: "idle", message: "" });
 
-      if (endpoint) {
-        // Google Apps Script web app. Sent as a "simple" request (URL-encoded,
-        // no custom headers) so the browser skips the CORS preflight that Apps
-        // Script can't answer. Response is opaque (no-cors) — reaching here
-        // without a network error means the row was logged + email sent.
-        await fetch(endpoint, {
-          method: "POST",
-          mode: "no-cors",
-          body: new URLSearchParams({
-            name: payload.name,
-            email: payload.email,
-            service: payload.service,
-            message: payload.message,
-          }),
-        });
-      } else {
-        const response = await fetch("https://api.web3forms.com/submit", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({
-            access_key: accessKey,
-            subject: `New inquiry — ${payload.service || "Creators Hub"}`,
-            from_name: "Creators Hub Website",
-            name: payload.name,
-            email: payload.email,
-            service: payload.service,
-            message: payload.message,
-          }),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok || !data?.success) {
-          throw new Error(
-            (data && typeof data.message === "string" && data.message) ||
-              "The request was not accepted. Please try again."
-          );
-        }
-      }
+      // Google Apps Script web app. Sent as a "simple" request (URL-encoded,
+      // no custom headers) so the browser skips the CORS preflight Apps Script
+      // can't answer. Response is opaque (no-cors) — reaching here without a
+      // network error means the row was logged + the email was sent.
+      await fetch(endpoint, {
+        method: "POST",
+        mode: "no-cors",
+        body: new URLSearchParams({
+          name: payload.name,
+          email: payload.email,
+          service: payload.service,
+          message: payload.message,
+        }),
+      });
 
       setStatus({
         type: "success",
