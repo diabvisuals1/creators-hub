@@ -4,7 +4,7 @@
  * falls back to the value below at build time.
  */
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || "https://creatorshub.com"
+  process.env.NEXT_PUBLIC_SITE_URL || "https://creatorshub.studio"
 ).replace(/\/+$/, "");
 
 export const SITE_NAME = "Creators Hub";
