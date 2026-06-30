@@ -63,9 +63,6 @@ export default function ContactUs() {
     message: "",
   });
 
-  // anti-spam honeypot: a hidden field that humans never see/fill, but bots do
-  const [honeypot, setHoneypot] = useState("");
-
   function onChange<K extends keyof FormState>(key: K, val: string) {
     setForm((prev) => ({ ...prev, [key]: val }));
   }
@@ -74,17 +71,6 @@ export default function ContactUs() {
     e.preventDefault();
 
     if (isSubmitting) return;
-
-    // bot caught by the honeypot → silently pretend it worked, send nothing
-    if (honeypot) {
-      setStatus({
-        type: "success",
-        message:
-          "Your message has been sent successfully. We'll get back to you soon.",
-      });
-      setForm({ name: "", email: "", service: "", message: "" });
-      return;
-    }
 
     const payload = {
       name: form.name.trim(),
@@ -217,18 +203,6 @@ export default function ContactUs() {
                   </h3>
 
                   <form onSubmit={onSubmit} className="mt-7 max-w-[560px] space-y-6">
-                    {/* honeypot: invisible to people, bots tend to fill it */}
-                    <input
-                      type="text"
-                      name="company"
-                      tabIndex={-1}
-                      autoComplete="off"
-                      aria-hidden="true"
-                      value={honeypot}
-                      onChange={(e) => setHoneypot(e.target.value)}
-                      className="pointer-events-none absolute left-[-9999px] h-0 w-0 opacity-0"
-                    />
-
                     <Field
                       label="Name*"
                       placeholder="John Doe"
