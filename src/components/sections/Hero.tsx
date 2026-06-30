@@ -60,10 +60,12 @@ function useTypeLoop(words: string[]) {
 }
 
 const companyLogos = [
+  { name: "Clique", src: "/hero/logos/Clique.png" },
   { name: "Sangovi", src: "/hero/logos/sangovi.png" },
   { name: "Gamax", src: "/hero/logos/gamax.png" },
   { name: "Reedy Sports Club", src: "/hero/logos/reedy.png" },
   { name: "EWC", src: "/hero/logos/ewc.png" },
+  { name: "Abu Flah", src: "/hero/logos/abofalah.png" },
 ];
 
 function HeroLogosBar() {
@@ -78,10 +80,10 @@ function HeroLogosBar() {
         <div
           className="
             flex flex-wrap items-center justify-center
-            gap-x-10 gap-y-6
+            gap-x-8 gap-y-6
             py-6
-            sm:gap-x-14 sm:py-7
-            lg:gap-x-20
+            sm:gap-x-10 sm:py-7
+            lg:gap-x-14
           "
         >
           {companyLogos.map((logo, index) => (
@@ -95,7 +97,7 @@ function HeroLogosBar() {
                 ease: "easeOut",
               }}
               whileHover={{ y: -3 }}
-              className="group flex h-[62px] w-[150px] cursor-default items-center justify-center"
+              className="group flex h-[60px] w-[132px] cursor-default items-center justify-center"
               aria-label={logo.name}
             >
               <img
@@ -284,8 +286,7 @@ export default function Hero() {
                   className="max-w-[980px] text-[#151A43]"
                 >
                   <span className="block text-[34px] leading-[1.02] tracking-[-0.01em] sm:text-[52px] md:text-[66px]">
-                    <span className="font-head">CREATORS HUB </span>
-                    <span className="font-bold">-</span>
+                    <span className="font-head">CREATORS HUB</span>
                   </span>
 
                   <span className="block text-[34px] font-bold leading-[1.02] tracking-[-0.01em] sm:text-[52px] md:text-[66px]">
@@ -319,7 +320,7 @@ export default function Hero() {
                   className="group mt-7 flex items-center gap-3 sm:mt-9"
                 >
                   <Link
-                    href="#our-work"
+                    href="#selected-projects"
                     scroll={false}
                     className="flex h-[48px] items-center justify-center rounded-[8px] border-2 border-[#FF1E1E] bg-transparent px-6 text-[13px] font-semibold text-[#FF1E1E] transition-all duration-300 group-hover:bg-[#FF1E1E] group-hover:text-white group-hover:shadow-[0_10px_30px_rgba(255,30,30,0.28)] active:scale-[0.98] sm:h-[54px] sm:px-8 sm:text-[14px]"
                   >
@@ -327,8 +328,9 @@ export default function Hero() {
                   </Link>
 
                   <Link
-                    href="/search"
-                    aria-label="Search"
+                    href="#selected-projects"
+                    scroll={false}
+                    aria-label="View our work"
                     className="flex h-[48px] w-[48px] items-center justify-center rounded-[8px] border-2 border-[#FF1E1E] bg-transparent text-[#FF1E1E] transition-all duration-300 group-hover:bg-[#FF1E1E] group-hover:text-white group-hover:shadow-[0_10px_30px_rgba(255,30,30,0.28)] active:scale-[0.98] sm:h-[54px] sm:w-[54px]"
                   >
                     <FiChevronRight className="text-[18px] sm:text-[20px]" />

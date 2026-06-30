@@ -303,8 +303,8 @@ function Field({
   type?: React.HTMLInputTypeAttribute;
 }) {
   return (
-    <div>
-      <label className="mb-2 block text-[12px] font-semibold text-[#151A43]">
+    <div className="group">
+      <label className="mb-2 block text-[12px] font-semibold text-[#151A43]/70 transition-colors duration-200 group-focus-within:text-[#151A43]">
         {label}
       </label>
 
@@ -314,7 +314,7 @@ function Field({
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           rows={5}
-          className="w-full resize-none rounded-[10px] border border-black/25 bg-transparent px-4 py-3 text-[13px] outline-none placeholder:text-black/35 focus:border-black/40"
+          className="w-full resize-none rounded-[10px] border border-[#151A43]/25 bg-white/30 px-4 py-3 text-[13px] text-[#151A43] outline-none transition-all duration-200 placeholder:text-[#151A43]/35 focus:border-[#151A43] focus:bg-white/70 focus:ring-4 focus:ring-[#151A43]/12"
         />
       ) : (
         <input
@@ -322,7 +322,7 @@ function Field({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="w-full rounded-[10px] border border-black/25 bg-transparent px-4 py-3 text-[13px] outline-none placeholder:text-black/35 focus:border-black/40"
+          className="w-full rounded-[10px] border border-[#151A43]/25 bg-white/30 px-4 py-3 text-[13px] text-[#151A43] outline-none transition-all duration-200 placeholder:text-[#151A43]/35 focus:border-[#151A43] focus:bg-white/70 focus:ring-4 focus:ring-[#151A43]/12"
         />
       )}
     </div>

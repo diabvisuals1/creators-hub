@@ -95,7 +95,7 @@ function WayWeWork() {
               strength={120}
               dragBoundsRef={dragBoundsRef}
               label="BRIEF & DIRECTION"
-              className="left-[20%] top-[14%] sm:left-[15%] sm:top-[15%]"
+              className="left-[22%] top-[12%] sm:left-[14%] sm:top-[20%]"
               trail="left"
               pillClass="bg-white text-[#B7AE00]"
               trailClass="bg-[#C9D240]/45"
@@ -105,7 +105,7 @@ function WayWeWork() {
               strength={140}
               dragBoundsRef={dragBoundsRef}
               label="EDITING & DESIGN"
-              className="left-[78%] top-[12%] sm:left-[83%] sm:top-[14%]"
+              className="left-[78%] top-[12%] sm:left-[86%] sm:top-[20%]"
               trail="right"
               pillClass="bg-[#151B3A] text-white"
               trailClass="bg-[#D8D8DD]/55"
@@ -115,27 +115,27 @@ function WayWeWork() {
               strength={150}
               dragBoundsRef={dragBoundsRef}
               label="REVIEW & REFINEMENT"
-              className="left-[50%] top-[26%] sm:left-[50%] sm:top-[9%]"
+              className="left-[50%] top-[28%] sm:left-[50%] sm:top-[10%]"
               trail="right"
               pillClass="bg-[#3F7BFF] text-white"
               trailClass="bg-[#AFC6FF]/45"
             />
             <AirPill
               progress={scrollYProgress}
-              strength={110}
+              strength={85}
               dragBoundsRef={dragBoundsRef}
               label="PLATFORM-READY DELIVERY"
-              className="left-[28%] top-[74%] sm:left-[27%] sm:top-[76%]"
+              className="left-[26%] top-[74%] sm:left-[26%] sm:top-[78%]"
               trail="left"
               pillClass="bg-[#10E6C6] text-[#08352F]"
               trailClass="bg-[#10E6C6]/22"
             />
             <AirPill
               progress={scrollYProgress}
-              strength={150}
+              strength={85}
               dragBoundsRef={dragBoundsRef}
               label="CREATIVE CONSISTENCY"
-              className="left-[72%] top-[80%] sm:left-[73%] sm:top-[78%]"
+              className="left-[74%] top-[86%] sm:left-[77%] sm:top-[88%]"
               trail="left"
               pillClass="bg-[#151B3A] text-white"
               trailClass="bg-[#151B3A]/30"

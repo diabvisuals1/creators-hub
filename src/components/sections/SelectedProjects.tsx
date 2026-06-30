@@ -289,8 +289,7 @@ export default function SelectedProjects() {
         emoji: "💬",
         subtitle: "[ SOCIAL MEDIA ]",
         blurb: [
-          "Feed posts, story sets, and reel covers designed to keep a profile consistent, recognizable, and scroll-stopping.",
-          "Built as a system, so every placement looks like it belongs to the same brand.",
+          "Feed posts, story sets, and reel covers that keep a profile consistent and scroll-stopping.",
         ],
         galleryRatio: "4 / 5",
         items: [
@@ -312,8 +311,7 @@ export default function SelectedProjects() {
         emoji: "🖼️",
         subtitle: "[ THUMBNAILS ]",
         blurb: [
-          "Scroll-stopping YouTube thumbnails engineered for contrast, clarity, and curiosity — the difference between a click and a skip.",
-          "Each design is tested for readability at every size, from desktop to the smallest mobile feed.",
+          "Scroll-stopping YouTube thumbnails built for contrast, clarity, and clicks.",
         ],
         galleryRatio: "16 / 9",
         items: [
@@ -334,8 +332,7 @@ export default function SelectedProjects() {
         emoji: "✨",
         subtitle: "[ BRANDING & DESIGN ]",
         blurb: [
-          "Logos, color and typography systems, and brand direction that make a presence feel professional and consistent.",
-          "Delivered with ready-to-use assets and guidelines, so the brand stays sharp across every platform.",
+          "Logos, color, and type systems that make a brand feel sharp and consistent.",
         ],
         galleryRatio: "4 / 3",
         items: [
@@ -416,16 +413,6 @@ export default function SelectedProjects() {
     },
     [catIndex]
   );
-
-  const prevCategory = useCallback(() => {
-    const n = categories.length;
-    selectCategory((catIndex - 1 + n) % n, -1);
-  }, [catIndex, categories.length, selectCategory]);
-
-  const nextCategory = useCallback(() => {
-    const n = categories.length;
-    selectCategory((catIndex + 1) % n, 1);
-  }, [catIndex, categories.length, selectCategory]);
 
   useEffect(() => {
     const updateViewport = () => {
@@ -1034,13 +1021,8 @@ export default function SelectedProjects() {
             {isGallery ? (
               <GalleryFullscreen
                 category={activeCat}
-                categories={categories}
-                catIndex={catIndex}
                 isMobile={isMobileView}
                 onClose={() => setIsFullscreen(false)}
-                onPrevCat={prevCategory}
-                onNextCat={nextCategory}
-                onSelectCategory={(i) => selectCategory(i)}
               />
             ) : isMobileView ? (
               <>
@@ -1252,6 +1234,8 @@ export default function SelectedProjects() {
               </>
             ) : (
               <>
+                <div aria-hidden="true" className="absolute inset-0 bg-[#06111B]" />
+
                 {isVertical && (
                   <div
                     aria-hidden="true"
@@ -1286,7 +1270,7 @@ export default function SelectedProjects() {
                     ref={videoRef}
                     src={activeItem.video}
                     poster={activePoster}
-                    className="absolute inset-0 h-full w-full object-cover"
+                    className="absolute inset-0 h-full w-full object-contain"
                     playsInline
                     muted={muted}
                     controls={false}
@@ -1531,22 +1515,12 @@ export default function SelectedProjects() {
 
 function GalleryFullscreen({
   category,
-  categories,
-  catIndex,
   isMobile,
   onClose,
-  onPrevCat,
-  onNextCat,
-  onSelectCategory,
 }: {
   category: Category;
-  categories: Category[];
-  catIndex: number;
   isMobile: boolean;
   onClose: () => void;
-  onPrevCat: () => void;
-  onNextCat: () => void;
-  onSelectCategory: (i: number) => void;
 }) {
   const images = category.items;
   const ratio = category.galleryRatio ?? "16 / 9";
@@ -1607,7 +1581,7 @@ function GalleryFullscreen({
           </span>
         </div>
 
-        <p className="mt-3 hidden max-w-[640px] text-[15px] leading-[1.5] text-white/75 sm:block">
+        <p className="mt-3 line-clamp-2 hidden max-w-[560px] text-[15px] leading-[1.5] text-white/75 sm:block">
           {category.blurb.join(" ")}
         </p>
       </div>
@@ -1691,54 +1665,6 @@ function GalleryFullscreen({
               </span>
             </motion.button>
           ))}
-        </div>
-      </div>
-
-      {/* bottom category nav */}
-      <div className="absolute bottom-0 left-0 right-0 z-[240]">
-        <div className="flex items-center justify-center gap-2 px-4 pb-[max(18px,env(safe-area-inset-bottom))] pt-4 sm:gap-3">
-          <button
-            type="button"
-            onClick={onPrevCat}
-            className="grid h-[44px] w-[44px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/10 backdrop-blur-sm transition hover:bg-[var(--catSoft)] hover:shadow-[0_0_16px_var(--catGlow)]"
-            aria-label="Previous category"
-          >
-            <IconImg src={VIDEO_ICONS.prev} alt="Previous" size={18} />
-          </button>
-
-          <div
-            className="flex max-w-[72vw] items-center gap-2 overflow-x-auto px-1"
-            style={{ scrollbarWidth: "none" }}
-          >
-            {categories.map((c, i) => {
-              const activeChip = i === catIndex;
-              return (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => onSelectCategory(i)}
-                  className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-3 py-2 text-[11px] font-bold tracking-[0.04em] transition-all duration-300 hover:-translate-y-[2px]"
-                  style={{
-                    backgroundColor: activeChip ? c.accent : "rgba(255,255,255,0.08)",
-                    color: activeChip ? "#0B0F2A" : "rgba(255,255,255,0.78)",
-                    boxShadow: activeChip ? `0 8px 22px ${c.accent}55` : "none",
-                  }}
-                >
-                  <span aria-hidden="true">{c.emoji}</span>
-                  <span className="whitespace-nowrap">{c.label.split("/")[0]?.trim()}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          <button
-            type="button"
-            onClick={onNextCat}
-            className="grid h-[44px] w-[44px] shrink-0 cursor-pointer place-items-center rounded-full bg-white/10 backdrop-blur-sm transition hover:bg-[var(--catSoft)] hover:shadow-[0_0_16px_var(--catGlow)]"
-            aria-label="Next category"
-          >
-            <IconImg src={VIDEO_ICONS.next} alt="Next" size={18} />
-          </button>
         </div>
       </div>
 

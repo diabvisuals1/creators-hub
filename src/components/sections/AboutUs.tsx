@@ -1,6 +1,14 @@
 "use client";
 
 import React from "react";
+import { Award, Clapperboard, Globe, Users } from "lucide-react";
+
+const STATS = [
+  { value: "6+", label: "Years of Experience", Icon: Award, accent: "#31388C" },
+  { value: "Video + Design", label: "Creative Production", Icon: Clapperboard, accent: "#FF1E1E" },
+  { value: "Worldwide", label: "Remote Delivery", Icon: Globe, accent: "#1BA774" },
+  { value: "Creators / Brands / Events", label: "Who We Support", Icon: Users, accent: "#4186FF" },
+];
 
 export default function AboutUs() {
   return (
@@ -83,51 +91,38 @@ export default function AboutUs() {
               {/* White stats card */}
               <div
                 className="
-                  relative w-full overflow-hidden rounded-[10px]
-                  border border-[#AEB4CC] bg-white
+                  relative w-full overflow-hidden rounded-[14px]
+                  border border-[#AEB4CC]/60 bg-white
                   flex items-center
                   min-h-[239px]
-                  px-[18px] py-[22px]
+                  p-[12px]
                   transition-all duration-300 ease-out
                   hover:-translate-y-[4px]
                 "
               >
-                <div className="grid w-full grid-cols-2 place-items-center gap-x-[14px] gap-y-[20px]">
-                  <div className="text-center">
-                    <h3 className="text-[26px] font-extrabold leading-[1.1] text-[#31388C] sm:text-[30px] lg:text-[26px] text-balance">
-                      6+
-                    </h3>
-                    <p className="mt-[10px] text-[14px] font-semibold leading-[1.2] text-[#31388C] sm:text-[15px]">
-                      Years of Experience
-                    </p>
-                  </div>
-
-                  <div className="text-center">
-                    <h3 className="text-[26px] font-extrabold leading-[1.1] text-[#31388C] sm:text-[30px] lg:text-[26px] text-balance">
-                      Video + Design
-                    </h3>
-                    <p className="mt-[10px] text-[14px] font-semibold leading-[1.2] text-[#31388C] sm:text-[15px]">
-                      Creative Production
-                    </p>
-                  </div>
-
-                  <div className="text-center">
-                    <h3 className="text-[26px] font-extrabold leading-[1.1] text-[#31388C] sm:text-[30px] lg:text-[26px] text-balance">
-                      Worldwide
-                    </h3>
-                    <p className="mt-[10px] text-[14px] font-semibold leading-[1.2] text-[#31388C] sm:text-[15px]">
-                      Remote Delivery
-                    </p>
-                  </div>
-
-                  <div className="text-center">
-                    <h3 className="text-[26px] font-extrabold leading-[1.1] text-[#31388C] sm:text-[30px] lg:text-[26px] text-balance">
-                      Creators / Brands / Events
-                    </h3>
-                    <p className="mt-[10px] text-[14px] font-semibold leading-[1.2] text-[#31388C] sm:text-[15px]">
-                      Who We Support
-                    </p>
-                  </div>
+                <div className="grid w-full grid-cols-2 gap-[10px]">
+                  {STATS.map((s) => {
+                    const Icon = s.Icon;
+                    return (
+                      <div
+                        key={s.label}
+                        className="group/stat flex flex-col items-center justify-center rounded-[12px] border border-[#31388C]/10 bg-[#F6F7FC] px-2.5 py-[14px] text-center transition-all duration-300 ease-out hover:-translate-y-[3px] hover:border-[#31388C]/25 hover:bg-white hover:shadow-[0_14px_26px_rgba(49,56,140,0.14)]"
+                      >
+                        <span
+                          className="mb-[9px] grid h-[34px] w-[34px] place-items-center rounded-full transition-transform duration-300 group-hover/stat:scale-110"
+                          style={{ backgroundColor: `${s.accent}18`, color: s.accent }}
+                        >
+                          <Icon size={17} strokeWidth={2.4} />
+                        </span>
+                        <h3 className="text-balance text-[15px] font-extrabold leading-[1.12] text-[#31388C] sm:text-[17px]">
+                          {s.value}
+                        </h3>
+                        <p className="mt-[5px] text-[11px] font-semibold leading-[1.2] text-[#31388C]/65 sm:text-[12px]">
+                          {s.label}
+                        </p>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
