@@ -1,7 +1,12 @@
 {
   "name": "creators-hub",
   "compatibility_date": "2026-02-03",
+  "main": "worker/index.js",
   "assets": {
-    "directory": "./out"
+    "directory": "./out",
+    "binding": "ASSETS"
+  },
+  "vars": {
+    "GOOGLE_SCRIPT_URL": "https://script.google.com/macros/s/AKfycbzw-SeeLMd9XLjzOo0OZRn0022OzuJjuTc0PdkzLhtoVLuYb4ZlEfCnLQzShbSonxq6cA/exec"
   }
 }

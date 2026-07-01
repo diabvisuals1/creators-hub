@@ -96,38 +96,27 @@ export default function ContactUs() {
       return;
     }
 
-    const endpoint = process.env.NEXT_PUBLIC_FORM_ENDPOINT?.trim() || "";
-
-    if (!endpoint) {
-      setStatus({
-        type: "error",
-        message:
-          "The contact form isn't connected yet. Add NEXT_PUBLIC_FORM_ENDPOINT (your Google Apps Script Web App URL).",
-      });
-      return;
-    }
-
     try {
       setIsSubmitting(true);
       setStatus({ type: "idle", message: "" });
 
-      // debug: shows in the browser console which URL the live build is using
-      console.info("Contact form → posting to:", endpoint);
-
-      // Google Apps Script web app. Sent as a "simple" request (URL-encoded,
-      // no custom headers) so the browser skips the CORS preflight Apps Script
-      // can't answer. Response is opaque (no-cors) — reaching here without a
-      // network error means the row was logged + the email was sent.
-      await fetch(endpoint, {
+      // Post to our own same-origin API (a Cloudflare Worker) which forwards
+      // the lead to Google Apps Script server-to-server. Same-origin avoids
+      // ad blockers (they block direct browser calls to script.google.com)
+      // and returns a real JSON result we can actually check.
+      const res = await fetch("/api/contact", {
         method: "POST",
-        mode: "no-cors",
-        body: new URLSearchParams({
-          name: payload.name,
-          email: payload.email,
-          service: payload.service,
-          message: payload.message,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || !data?.success) {
+        throw new Error(
+          (data && typeof data.error === "string" && data.error) ||
+            "The request was not accepted. Please try again."
+        );
+      }
 
       setStatus({
         type: "success",
