@@ -111,6 +111,9 @@ export default function ContactUs() {
       setIsSubmitting(true);
       setStatus({ type: "idle", message: "" });
 
+      // debug: shows in the browser console which URL the live build is using
+      console.info("Contact form → posting to:", endpoint);
+
       // Google Apps Script web app. Sent as a "simple" request (URL-encoded,
       // no custom headers) so the browser skips the CORS preflight Apps Script
       // can't answer. Response is opaque (no-cors) — reaching here without a
